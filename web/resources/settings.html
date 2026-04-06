@@ -51,6 +51,17 @@
   .topbar-left span { color: var(--text-main); font-weight: 600; }
   .topbar-right { display: flex; align-items: center; gap: 14px; }
 
+  .nav-menu {
+    display: flex; align-items: center; gap: 0;
+  }
+
+  .nav-item {
+    padding: 8px 14px; font-size: 13px; color: var(--gray); cursor: pointer;
+    border-bottom: 3px solid transparent; transition: all 0.2s; font-weight: 500;
+  }
+
+  .nav-item:hover, .nav-item.active { color: var(--red); border-bottom-color: var(--red); }
+
   .avatar {
     width: 32px; height: 32px; background: var(--blue);
     border-radius: 50%; display: flex; align-items: center; justify-content: center;
@@ -160,7 +171,14 @@
   
   <div class="topbar">
     <div class="topbar-left">
-      <span>Dashboard</span> / Settings
+      <div class="nav-menu">
+        <div class="nav-item" onclick="window.location.href='index.html'">Dashboard</div>
+        <div class="nav-item" onclick="window.location.href='analytics.html'">Analytics</div>
+        <div class="nav-item" onclick="window.location.href='transaction.html'">Transactions</div>
+        <div class="nav-item" onclick="window.location.href='device.html'">Devices</div>
+        <div class="nav-item" onclick="window.location.href='usermanagement.html'">Users</div>
+        <div class="nav-item active" onclick="window.location.href='settings.html'">Settings</div>
+      </div>
     </div>
     <div class="topbar-right">
       <div class="avatar">AS</div>

@@ -80,6 +80,17 @@
     font-family: 'Sora', sans-serif;
   }
 
+  .nav-menu {
+    display: flex; align-items: center; gap: 0; margin-right: 16px;
+  }
+
+  .nav-item {
+    padding: 8px 14px; font-size: 13px; color: var(--gray); cursor: pointer;
+    border-bottom: 3px solid transparent; transition: all 0.2s; font-weight: 500;
+  }
+
+  .nav-item:hover, .nav-item.active { color: var(--red); border-bottom-color: var(--red); }
+
   /* ── HERO BANNER ── */
   .hero-banner {
     background: linear-gradient(135deg, var(--red-dark) 0%, var(--red) 55%, #EF5350 100%);
@@ -280,7 +291,13 @@
   
   <div class="topbar">
     <div class="topbar-left">
-      <span>Dashboard</span> / Analytic Report
+      <div class="nav-menu">
+        <div class="nav-item" onclick="window.location.href='index.html'">Dashboard</div>
+        <div class="nav-item active" onclick="window.location.href='analytics.html'">Analytics</div>
+        <div class="nav-item" onclick="window.location.href='transaction.html'">Transactions</div>
+        <div class="nav-item" onclick="window.location.href='device.html'">Devices</div>
+        <div class="nav-item" onclick="window.location.href='usermanagement.html'">Users</div>
+      </div>
     </div>
     <div class="topbar-right">
       <div class="topbar-date">
