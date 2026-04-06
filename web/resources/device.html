@@ -127,21 +127,61 @@
         }
         .icon-btn:hover { background: var(--surface); color: var(--red); border-color: var(--red-light); }
 
+        /* ── HAMBURGER MENU ── */
+        .hamburger-btn {
+            display: none; flex-direction: column; width: 24px; height: 20px; cursor: pointer; gap: 5px;
+            background: none; border: none; padding: 0;
+        }
+        .hamburger-btn span { width: 100%; height: 2px; background: var(--text-main); border-radius: 2px; transition: all 0.3s; }
+        .hamburger-btn.active span:nth-child(1) { transform: rotate(45deg) translate(8px, 8px); }
+        .hamburger-btn.active span:nth-child(2) { opacity: 0; }
+        .hamburger-btn.active span:nth-child(3) { transform: rotate(-45deg) translate(7px, -7px); }
+
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 39; opacity: 0; transition: opacity 0.3s; }
+        .sidebar-overlay.active { opacity: 1; }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 1024px) {
+            .action-bar { gap: 8px; }
+            .content { padding: 16px 20px; }
+            .device-table { font-size: 12px; }
+            .device-table td, .device-table th { padding: 12px 16px; }
+        }
+
         @media (max-width: 768px) {
+            .hamburger-btn { display: flex; }
+            .topbar { padding: 0 16px; }
             .action-bar { flex-direction: column; align-items: stretch; }
             .search-container { max-width: 100%; }
             .device-table { font-size: 12px; }
             .device-table td, .device-table th { padding: 10px 12px; }
             .action-btns { flex-wrap: wrap; }
+            .btn { font-size: 12px; padding: 8px 14px; }
         }
 
         @media (max-width: 576px) {
-            .topbar { padding: 0 16px; }
-            .content { padding: 16px; }
+            .topbar { padding: 0 12px; height: 52px; }
+            .content { padding: 14px 12px; }
+            .action-bar { gap: 8px; margin-bottom: 14px; }
+            .search-container { padding: 7px 12px; max-width: 100%; }
+            .search-container input { font-size: 12px; }
+            .btn { font-size: 11px; padding: 6px 12px; }
+            .device-table { font-size: 11px; }
             .device-table th { display: none; }
-            .device-table tr { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; padding: 12px; }
-            .device-table td { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: none; }
+            .device-table tr { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; padding: 10px; background: var(--surface); }
+            .device-table td { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: none; font-size: 11px; }
             .device-table td::before { content: attr(data-label); font-weight: 700; color: var(--gray); }
+            .icon-btn { width: 28px; height: 28px; font-size: 10px; }
+            .device-id { font-size: 12px; }
+            .badge { font-size: 10px; padding: 3px 8px; }
+        }
+
+        @media (max-width: 480px) {
+            .content { padding: 12px 10px; }
+            .search-container { padding: 6px 10px; }
+            .btn { padding: 5px 10px; font-size: 10px; }
+            .device-table td { font-size: 10px; padding: 4px 0; }
+            .icon-btn { width: 24px; height: 24px; }
         }
 
     </style>

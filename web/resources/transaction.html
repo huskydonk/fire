@@ -170,29 +170,69 @@
 
         .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
+        /* ── HAMBURGER MENU ── */
+        .hamburger-btn {
+            display: none; flex-direction: column; width: 24px; height: 20px; cursor: pointer; gap: 5px;
+            background: none; border: none; padding: 0;
+        }
+        .hamburger-btn span { width: 100%; height: 2px; background: var(--text-main); border-radius: 2px; transition: all 0.3s; }
+        .hamburger-btn.active span:nth-child(1) { transform: rotate(45deg) translate(8px, 8px); }
+        .hamburger-btn.active span:nth-child(2) { opacity: 0; }
+        .hamburger-btn.active span:nth-child(3) { transform: rotate(-45deg) translate(7px, -7px); }
+
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 39; opacity: 0; transition: opacity 0.3s; }
+        .sidebar-overlay.active { opacity: 1; }
+
         /* ── RESPONSIVE ── */
+        @media (max-width: 1024px) {
+            .topbar { padding: 14px 20px; }
+            .content { padding: 18px 20px; }
+            .page-title { font-size: 20px; }
+            .transaction-table { font-size: 12px; }
+            .transaction-table th, .transaction-table td { padding: 12px 14px; }
+        }
+
         @media (max-width: 768px) {
+            .hamburger-btn { display: flex; }
+            .topbar { padding: 0 16px; }
             .action-bar { flex-direction: column; align-items: stretch; }
             .search-container { max-width: 100%; }
             .transaction-table { font-size: 12px; }
             .transaction-table th, .transaction-table td { padding: 10px 12px; }
             .content { padding: 16px 20px; }
             .page-title { font-size: 18px; }
+            .export-btn, .add-btn { font-size: 12px; padding: 8px 14px; }
         }
 
         @media (max-width: 576px) {
-            .topbar { padding: 0 16px; }
-            .content { padding: 16px; }
-            .page-title { font-size: 16px; margin-bottom: 16px; }
-            .action-bar { flex-direction: column; align-items: stretch; gap: 10px; }
-            .search-container { max-width: 100%; }
+            .topbar { padding: 0 12px; height: 52px; }
+            .content { padding: 12px; }
+            .page-title { font-size: 16px; margin-bottom: 12px; }
+            .page-header { margin-bottom: 14px; }
+            .action-bar { flex-direction: column; align-items: stretch; gap: 8px; margin-bottom: 14px; }
+            .search-container { max-width: 100%; font-size: 11px; padding: 0 10px; }
+            .search-input { font-size: 11px; padding: 8px 0; }
+            .transaction-table { font-size: 11px; }
             .transaction-table th { display: none; }
-            .transaction-table tr { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; padding: 12px; background: var(--surface); }
-            .transaction-table td { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: none; }
+            .transaction-table tr { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; padding: 10px; background: var(--surface); }
+            .transaction-table td { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: none; font-size: 11px; }
             .transaction-table td::before { font-weight: 700; color: var(--gray); }
-            .export-btn, .add-btn { width: 100%; justify-content: center; }
-            .pagination { flex-direction: column; gap: 12px; }
+            .export-btn, .add-btn { width: 100%; justify-content: center; font-size: 11px; padding: 8px 12px; }
+            .pagination { flex-direction: column; gap: 10px; padding: 12px; }
+            .page-info { font-size: 11px; }
             .page-ctrl { width: 100%; justify-content: center; }
+            .page-btn { width: 28px; height: 28px; font-size: 11px; }
+        }
+
+        @media (max-width: 480px) {
+            .content { padding: 10px 8px; }
+            .page-title { font-size: 14px; }
+            .action-bar { gap: 6px; }
+            .search-container { font-size: 10px; padding: 0 8px; }
+            .transaction-table { font-size: 10px; }
+            .transaction-table td { font-size: 10px; padding: 3px 0; }
+            .export-btn, .add-btn { font-size: 10px; padding: 6px 10px; }
+            .page-btn { width: 24px; height: 24px; font-size: 10px; }
         }
 
         ::-webkit-scrollbar { width: 5px; }

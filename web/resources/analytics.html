@@ -260,29 +260,155 @@
   ::-webkit-scrollbar-track { background: var(--surface); }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
+  @media (max-width: 1024px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .content { padding: 18px 20px; }
+    .card { padding: 16px; }
+  }
+
   @media (max-width: 768px) {
-    .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
     .three-col { grid-template-columns: repeat(2, 1fr); }
-    .content { padding: 16px 20px; }
-    .card { padding: 20px; }
+    .two-col { grid-template-columns: 1fr; }
+    .content { padding: 14px 16px; }
+    .card { padding: 14px; }
     .section-title { font-size: 12px; }
-    .bar-chart { height: 120px; }
+    .bar-chart { height: 110px; }
     .bar-label { font-size: 8px; }
+    .topbar { padding: 0 16px; height: 54px; }
+    .nav-item { padding: 8px 12px; font-size: 12px; }
+    .time-tabs { flex-wrap: wrap; gap: 2px; }
+    .time-tab { padding: 4px 10px; font-size: 11px; }
+    .export-btn { padding: 6px 12px; font-size: 12px; }
   }
 
   @media (max-width: 576px) {
-    .topbar { padding: 0 16px; }
-    .stats-grid { grid-template-columns: 1fr; gap: 12px; }
+    .topbar { padding: 0 12px; }
+    .stats-grid { grid-template-columns: 1fr; gap: 10px; }
     .three-col { grid-template-columns: 1fr; }
     .two-col { grid-template-columns: 1fr; }
-    .content { padding: 16px; }
-    .card { padding: 16px; }
+    .content { padding: 12px; }
+    .card { padding: 12px; }
+    .card-title { font-size: 12px; margin-bottom: 10px; }
     .section-title { font-size: 11px; }
-    .bar-chart { height: 100px; gap: 3px; }
+    .bar-chart { height: 90px; gap: 2px; }
     .bar-group { gap: 2px; }
     .bar-label { font-size: 7px; }
-    .time-tabs { flex-wrap: wrap; }
+    .time-tabs { gap: 2px; padding: 3px; }
+    .time-tab { padding: 3px 8px; font-size: 10px; }
     .export-btn { padding: 5px 10px; font-size: 11px; }
+    .stat-label { font-size: 10px; }
+    .stat-value { font-size: 18px; }
+    .hero-banner { padding: 14px 16px; }
+    .hero-seal { width: 56px; height: 56px; }
+    .hero-text h1 { font-size: 18px; }
+    .hero-text p { font-size: 11px; }
+    .incident-table { font-size: 11px; }
+    .incident-table th { font-size: 9px; padding: 6px 8px; }
+    .incident-table td { padding: 8px 6px; font-size: 11px; }
+  }
+
+  @media (max-width: 480px) {
+    body { font-size: 13px; }
+    .topbar { height: 50px; padding: 0 10px; }
+    .stats-grid { gap: 8px; }
+    .stat-card { padding: 8px; }
+    .stat-label { font-size: 9px; }
+    .stat-value { font-size: 16px; }
+    .content { padding: 10px; }
+    .card { padding: 10px; }
+    .card-title { font-size: 11px; gap: 4px; }
+    .bar-chart { height: 70px; }
+    .time-tab { padding: 2px 6px; font-size: 9px; }
+    .export-btn { padding: 4px 8px; font-size: 10px; }
+    .incident-table { font-size: 10px; }
+    .incident-table th { font-size: 8px; padding: 4px 6px; }
+    .incident-table td { padding: 6px 4px; font-size: 10px; }
+  }
+</style>
+
+<style>
+  /* ── HAMBURGER MENU & MOBILE NAV ── */
+  .hamburger-btn {
+    display: none;
+    width: 40px; height: 40px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    padding: 8px;
+  }
+
+  .hamburger-btn span {
+    display: block;
+    width: 24px; height: 2px;
+    background: var(--text-main);
+    border-radius: 1px;
+    transition: all 0.3s ease;
+  }
+
+  .hamburger-btn.active span:nth-child(1) {
+    transform: rotate(45deg) translate(8px, 8px);
+  }
+
+  .hamburger-btn.active span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .hamburger-btn.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -7px);
+  }
+
+  .nav-menu-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 49;
+  }
+
+  .nav-menu-overlay.active {
+    display: block;
+  }
+
+  @media (max-width: 768px) {
+    .hamburger-btn { display: flex; }
+    
+    .nav-menu {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 200px;
+      height: 100vh;
+      background: white;
+      flex-direction: column;
+      gap: 0;
+      padding: 60px 0 0;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      z-index: 60;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+      border-radius: 0;
+    }
+    
+    .nav-menu.mobile-open {
+      transform: translateX(0);
+    }
+
+    .nav-item {
+      padding: 14px 20px;
+      margin: 0;
+      border-radius: 0;
+      border-bottom: 1px solid var(--border);
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .topbar { height: 54px; }
   }
 </style>
 </head>
@@ -292,7 +418,12 @@
   
   <div class="topbar">
     <div class="topbar-left">
-      <div class="nav-menu">
+      <button class="hamburger-btn" id="hamburgerBtn" title="Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="nav-menu" id="navMenu">
         <div class="nav-item" onclick="window.location.href='index.html'">Dashboard</div>
         <div class="nav-item active" onclick="window.location.href='analytics.html'">Analytics</div>
         <div class="nav-item" onclick="window.location.href='transaction.html'">Transactions</div>
@@ -593,9 +724,9 @@
 
     // Sample locations with coordinates for demo (Daet Area)
     const locationCoords = {
-      'Talisay Central Elementary': { lat: 14.1280, lng: 121.9380 },
-      'City Hall Annex': { lat: 14.1100, lng: 121.9620 },
-      'Police Station': { lat: 14.0980, lng: 121.9510 },
+      'Talisay Central Elementary': { lat: 14.13686545301678, lng: 122.92541397403144 },
+      'City Hall Annex': { lat: 14.112388631835255, lng: 122.95498363814954 },
+      'Police Station': { lat: 14.092719411133004, lng: 122.95835976123468 },
     };
 
     // Add markers for each device
@@ -800,6 +931,29 @@
   window.addEventListener('resize', () => {
     if (mapsLoaded && map) {
       google.maps.event.trigger(map, 'resize');
+    }
+  });
+
+  // Mobile Navigation
+  const hamburgerBtn = document.getElementById('hamburgerBtn');
+  const navMenu = document.getElementById('navMenu');
+
+  hamburgerBtn.addEventListener('click', () => {
+    hamburgerBtn.classList.toggle('active');
+    navMenu.classList.toggle('mobile-open');
+  });
+
+  navMenu.addEventListener('click', (e) => {
+    if (e.target.classList.contains('nav-item')) {
+      hamburgerBtn.classList.remove('active');
+      navMenu.classList.remove('mobile-open');
+    }
+  });
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) {
+      hamburgerBtn.classList.remove('active');
+      navMenu.classList.remove('mobile-open');
     }
   });
 </script>

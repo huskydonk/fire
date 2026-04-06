@@ -428,6 +428,174 @@
   ::-webkit-scrollbar { width: 5px; }
   ::-webkit-scrollbar-track { background: var(--surface); }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  /* ── HAMBURGER MENU ── */
+  .hamburger-btn {
+    display: none;
+    width: 40px; height: 40px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    padding: 8px;
+  }
+
+  .hamburger-btn span {
+    display: block;
+    width: 24px; height: 2px;
+    background: var(--text-main);
+    border-radius: 1px;
+    transition: all 0.3s ease;
+  }
+
+  .hamburger-btn.active span:nth-child(1) {
+    transform: rotate(45deg) translate(8px, 8px);
+  }
+
+  .hamburger-btn.active span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .hamburger-btn.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -7px);
+  }
+
+  /* ── SIDEBAR OVERLAY ── */
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 49;
+  }
+
+  .sidebar-overlay.active {
+    display: block;
+  }
+
+  /* ── RESPONSIVE DESIGN ── */
+  @media (max-width: 1024px) {
+    .sidebar { width: 220px; }
+    .main { margin-left: 220px; }
+    .content { padding: 18px 20px; }
+    .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .card { padding: 16px; }
+  }
+
+  @media (max-width: 768px) {
+    .hamburger-btn { display: flex; }
+    
+    .sidebar { 
+      width: 240px;
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      z-index: 60;
+    }
+    
+    .sidebar.mobile-open {
+      transform: translateX(0);
+    }
+
+    .main { margin-left: 0; }
+    .topbar { padding: 0 16px; }
+    .content { padding: 14px 16px; }
+    
+    .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .stat-card { padding: 12px; }
+    .stat-label { font-size: 10px; }
+    .stat-value { font-size: 18px; }
+    
+    .two-col { grid-template-columns: 1fr; gap: 12px; }
+    .three-col { grid-template-columns: 1fr; gap: 12px; }
+    .card { padding: 14px; }
+    .card-title { font-size: 12.5px; }
+    
+    .bar-chart { height: 100px; gap: 3px; }
+    .bar-label { font-size: 8px; }
+    
+    .nav-menu { flex-wrap: wrap; gap: 0; }
+    .nav-item { padding: 8px 10px; font-size: 12px; margin: 2px 4px; }
+    .dropdown-item { font-size: 11.5px; padding: 6px 10px; }
+    
+    .time-tabs { flex-wrap: wrap; gap: 3px; }
+    .time-tab { padding: 4px 10px; font-size: 11px; }
+    
+    .incident-table { font-size: 12px; }
+    .incident-table th { font-size: 9.5px; padding: 6px 8px; }
+    .incident-table td { padding: 8px; font-size: 12px; }
+    
+    .collection-label { min-width: 80px; font-size: 12px; }
+    .collection-value { font-size: 12px; min-width: 50px; }
+  }
+
+  @media (max-width: 576px) {
+    .topbar { height: 54px; padding: 0 12px; }
+    .topbar-date { display: none; }
+    .content { padding: 12px; }
+    
+    .stats-grid { grid-template-columns: 1fr; gap: 8px; }
+    .stat-card { padding: 10px; }
+    .stat-value { font-size: 16px; }
+    .stat-icon-box { width: 40px; height: 40px; }
+    
+    .hero-banner { padding: 14px 16px; }
+    .hero-seal { width: 56px; height: 56px; }
+    .hero-text h1 { font-size: 18px; }
+    .hero-text p { font-size: 12px; }
+    
+    .card { padding: 12px; }
+    .card-title { font-size: 12px; margin-bottom: 10px; }
+    
+    .bar-chart { height: 80px; gap: 2px; }
+    .bar-group { gap: 2px; }
+    .bar-label { font-size: 7px; }
+    
+    .nav-menu { gap: 0; margin: 0; }
+    .nav-item { padding: 6px 8px; font-size: 11px; margin: 1px 2px; }
+    .nav-item .nav-icon { width: 14px; }
+    
+    .time-tabs { gap: 2px; padding: 3px; }
+    .time-tab { padding: 3px 8px; font-size: 10px; }
+    
+    .section-title { font-size: 11px; }
+    .incident-table { font-size: 10px; }
+    .incident-table th { font-size: 8px; padding: 4px 6px; }
+    .incident-table td { padding: 6px 4px; font-size: 10px; }
+    
+    .badge { padding: 2px 6px; font-size: 9px; }
+    .collection-label { font-size: 11px; min-width: 70px; }
+    .collection-value { font-size: 11px; min-width: 40px; }
+    .collection-bar-wrap { margin: 0 8px; }
+  }
+
+  @media (max-width: 480px) {
+    body { font-size: 13px; }
+    .content { padding: 10px; }
+    .stats-grid { gap: 6px; }
+    .stat-card { padding: 8px; margin: 0; }
+    .stat-label { font-size: 9px; margin-bottom: 4px; }
+    .stat-value { font-size: 14px; }
+    
+    .card { padding: 10px; }
+    .card-title { font-size: 11px; margin-bottom: 8px; gap: 4px; }
+    
+    .nav-item { padding: 5px 6px; font-size: 10px; gap: 8px; }
+    .bar-chart { height: 60px; }
+    
+    .time-tab { padding: 2px 6px; font-size: 9px; }
+    .export-btn { padding: 4px 8px; font-size: 10px; }
+    
+    .incident-table { font-size: 9px; }
+    .incident-table th { font-size: 7px; padding: 3px 4px; }
+    .incident-table td { padding: 4px 3px; font-size: 9px; }
+  }
 </style>
 </head>
 <body>
@@ -522,6 +690,11 @@
   <!-- TOPBAR -->
   <header class="topbar">
     <div class="topbar-left">
+      <button class="hamburger-btn" id="hamburgerBtn" title="Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
       <span>Dashboard</span>
     </div>
     <div class="topbar-right">
@@ -532,6 +705,9 @@
       <div class="avatar">AS</div>
     </div>
   </header>
+
+  <!-- SIDEBAR OVERLAY -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
   <!-- HERO BANNER -->
   <div class="hero-banner">
@@ -1011,14 +1187,9 @@
     dashboardMarkers = [];
 
     const locationCoords = {
-      'Talisay Central Elementary': { lat: 14.1280, lng: 121.9380 },
-      'City Hall Annex': { lat: 14.1100, lng: 121.9620 },
-      'Police Station': { lat: 14.0980, lng: 121.9510 },
-      'Hospital': { lat: 14.1200, lng: 121.9700 },
-      'University': { lat: 14.1350, lng: 121.9450 },
-      'Main Street': { lat: 14.1180, lng: 121.9500 },
-      'Building A': { lat: 14.1100, lng: 121.9600 },
-      'Fire Station': { lat: 14.1150, lng: 121.9520 }
+      'Talisay Central Elementary': { lat: 14.13686545301678, lng: 122.92541397403144 },
+      'City Hall Annex': { lat: 14.112388631835255, lng: 122.95498363814954 },
+      'Police Station': { lat: 14.092719411133004, lng: 122.95835976123468 },
     };
 
     devices.forEach(device => {
@@ -1108,6 +1279,47 @@
     clearAuthToken();
     window.location.href = 'login.html';
   }
+</script>
+
+<script>
+  // Mobile Navigation
+  const hamburgerBtn = document.getElementById('hamburgerBtn');
+  const sidebar = document.querySelector('.sidebar');
+  const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+  // Hamburger Menu Toggle
+  hamburgerBtn.addEventListener('click', () => {
+    hamburgerBtn.classList.toggle('active');
+    sidebar.classList.toggle('mobile-open');
+    sidebarOverlay.classList.toggle('active');
+  });
+
+  // Close sidebar when overlay is clicked
+  sidebarOverlay.addEventListener('click', () => {
+    hamburgerBtn.classList.remove('active');
+    sidebar.classList.remove('mobile-open');
+    sidebarOverlay.classList.remove('active');
+  });
+
+  // Close sidebar when a nav item is clicked
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      if (window.innerWidth <= 768) {
+        hamburgerBtn.classList.remove('active');
+        sidebar.classList.remove('mobile-open');
+        sidebarOverlay.classList.remove('active');
+      }
+    });
+  });
+
+  // Handle responsive changes
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) {
+      hamburgerBtn.classList.remove('active');
+      sidebar.classList.remove('mobile-open');
+      sidebarOverlay.classList.remove('active');
+    }
+  });
 </script>
 </body>
 </html>
