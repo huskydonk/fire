@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management | F.I.E.R.C.E</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --red: #D32F2F;
+            --red-dark: #B71C1C;
+            --red-light: #EF5350;
+            --red-muted: rgba(211,47,47,0.09);
+            --page-bg: #F5F6FA;
+            --card-bg: #FFFFFF;
+            --border: #E5E7EB;
+            --text-main: #111827;
+            --text-sub: #6B7280;
+            --gray: #6B7280;
+            --gray-light: #9CA3AF;
+            --surface: #F3F4F6;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--page-bg);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        .main { display: flex; flex-direction: column; min-height: 100vh; }
+
+        /* ── TOPBAR ── */
+        .topbar {
+            background: #fff; border-bottom: 1px solid var(--border);
+            padding: 0 24px; height: 58px;
+            display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 50;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+        }
+
+        .topbar-left { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gray); }
+        .topbar-left span { color: var(--text-main); font-weight: 600; }
+        .topbar-right { display: flex; align-items: center; gap: 14px; }
+
+        .avatar {
+            width: 32px; height: 32px; background: var(--red);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 700; color: white; cursor: pointer;
+            font-family: 'Sora', sans-serif;
+        }
+
+        /* ── CONTENT ── */
+        .content { padding: 24px; flex: 1; max-width: 1400px; margin: 0 auto; width: 100%; }
+
+        /* ── SEARCH & ACTIONS ── */
+        .action-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; gap: 16px; flex-wrap: wrap; }
+        
+        .search-box {
+            display: flex; align-items: center; gap: 10px; background: white;
+            padding: 8px 16px; border-radius: 10px; border: 1px solid var(--border);
+            flex: 1; max-width: 400px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .search-box input {
+            border: none; outline: none; font-family: 'DM Sans', sans-serif;
+            font-size: 13px; width: 100%; color: var(--text-main);
+        }
+
+        .add-btn {
+            display: flex; align-items: center; gap: 8px;
+            background: var(--red); border: none; color: white;
+            padding: 10px 18px; border-radius: 10px; font-size: 13px; font-weight: 600;
+            cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(211,47,47,0.2);
+        }
+        .add-btn:hover { background: var(--red-dark); transform: translateY(-1px); }
+
+        /* ── TABLE CARD ── */
+        .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+
+        .table-container { width: 100%; overflow-x: auto; }
+
+        .user-table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        .user-table th { 
+            background: var(--surface); font-family: 'Sora', sans-serif;
+            font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; 
+            color: var(--gray); padding: 14px 20px; text-align: left; font-weight: 700;
+        }
+        .user-table td { padding: 16px 20px; font-size: 13px; border-bottom: 1px solid var(--surface); color: var(--text-main); font-weight: 500; }
+        .user-table tr:hover td { background: rgba(0,0,0,0.01); }
+
+        .user-info { display: flex; align-items: center; gap: 12px; }
+        .user-id { font-family: 'Sora', sans-serif; font-size: 11px; color: var(--gray-light); font-weight: 600; }
+        
+        .contact-pill { font-size: 12px; color: var(--text-sub); }
+        
+        .action-icons { display: flex; gap: 8px; }
+        .icon-btn {
+            width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;
+            background: white;
+        }
+        .icon-btn:hover { background: var(--surface); border-color: var(--gray-light); }
+        .icon-btn.delete:hover { background: var(--red-muted); border-color: var(--red-light); color: var(--red); }
+
+        /* ── PAGINATION ── */
+        .pagination { 
+            padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; 
+            background: #fff; border-top: 1px solid var(--border);
+        }
+        .page-info { font-size: 12px; color: var(--gray); font-weight: 500; }
+        .page-ctrl { display: flex; gap: 5px; }
+        .page-btn {
+            width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border);
+            font-size: 12px; font-weight: 600; cursor: pointer; background: white;
+            display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+        }
+        .page-btn.active { background: var(--red); color: white; border-color: var(--red); box-shadow: 0 2px 6px rgba(211,47,47,0.2); }
+        .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+<div class="main">
+    <div class="topbar">
+        <div class="topbar-left">
+            <span>Administration</span> / User Management
+        </div>
+        <div class="topbar-right">
+            <div class="avatar">AS</div>
+        </div>
+    </div>
+
+
+    <div class="content">
+        <div class="action-row">
+            <div class="search-box">
+                <svg width="16" height="16" fill="none" stroke="var(--gray-light)" stroke-width="2" viewBox="0 0 24 24">
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input type="text" placeholder="Search users by name, ID or email...">
+            </div>
+            <button class="add-btn">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+                Add New User
+            </button>
+        </div>
+
+        <div class="card">
+            <div class="table-container">
+                <table class="user-table">
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Full Name</th>
+                            <th>Email Address</th>
+                            <th>Contact Number</th>
+                            <th>Date Created</th>
+                            <th style="text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="user-id">USER-001</span></td>
+                            <td><strong>Juan Dela Cruz</strong></td>
+                            <td class="contact-pill">useraccount2024@gmail.com</td>
+                            <td>09671507130</td>
+                            <td style="color: var(--gray);">Sep 25, 2025</td>
+                            <td>
+                                <div class="action-icons" style="justify-content: flex-end;">
+                                    <button class="icon-btn">
+                                        <svg width="14" height="14" fill="none" stroke="var(--blue)" stroke-width="2" viewBox="0 0 24 24">
+                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                        </svg>
+                                    </button>
+                                    <button class="icon-btn delete">
+                                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                </table>
+            </div>
+
+            <div class="pagination">
+                <div class="page-info">Showing 1 to 10 of 48 users</div>
+                <div class="page-ctrl">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn">...</button>
+                    <button class="page-btn">5</button>
+                    <button class="page-btn">&gt;</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Management | F.I.E.R.C.E</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --red: #D32F2F;
+            --red-dark: #B71C1C;
+            --red-light: #EF5350;
+            --red-muted: rgba(211,47,47,0.09);
+            --page-bg: #F5F6FA;
+            --card-bg: #FFFFFF;
+            --border: #E5E7EB;
+            --text-main: #111827;
+            --text-sub: #6B7280;
+            --gray: #6B7280;
+            --gray-light: #9CA3AF;
+            --surface: #F3F4F6;
+            --green: #10B981;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--page-bg);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        .main { display: flex; flex-direction: column; min-height: 100vh; }
+
+        /* ── TOPBAR ── */
+        .topbar {
+            background: #fff; border-bottom: 1px solid var(--border);
+            padding: 0 24px; height: 58px;
+            display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 50;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+        }
+
+        .topbar-left { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gray); }
+        .topbar-left span { color: var(--text-main); font-weight: 600; }
+        .topbar-right { display: flex; align-items: center; gap: 14px; }
+        .avatar {
+            width: 32px; height: 32px; background: var(--red);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 700; color: white; cursor: pointer;
+            font-family: 'Sora', sans-serif;
+        }
+
+        /* ── CONTENT ── */
+        .content { padding: 22px 24px; flex: 1; max-width: 1400px; margin: 0 auto; width: 100%; }
+
+        /* ── SEARCH & FILTER ── */
+        .action-bar {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 20px; gap: 12px;
+        }
+
+        .search-container {
+            display: flex; align-items: center; gap: 10px; background: white;
+            padding: 9px 16px; border-radius: 10px; border: 1px solid var(--border);
+            flex: 1; max-width: 450px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        .search-container input {
+            border: none; outline: none; font-family: 'DM Sans', sans-serif;
+            font-size: 13px; width: 100%; color: var(--text-main);
+        }
+
+        .btn {
+            display: flex; align-items: center; gap: 8px;
+            padding: 9px 18px; border-radius: 10px; font-size: 13px; font-weight: 600;
+            cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-red { 
+            background: var(--red); color: white; 
+            box-shadow: 0 4px 12px rgba(211,47,47,0.2);
+        }
+        .btn-red:hover { background: var(--red-dark); transform: translateY(-1px); }
+
+        .btn-outline {
+            background: white; border: 1px solid var(--border); color: var(--gray);
+        }
+        .btn-outline:hover { background: var(--surface); color: var(--text-main); }
+
+        /* ── TABLE CARD ── */
+        .card { 
+            background: var(--card-bg); border: 1px solid var(--border); 
+            border-radius: 14px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.05); 
+        }
+
+        .device-table { width: 100%; border-collapse: collapse; }
+        .device-table th { 
+            background: var(--surface); font-family: 'Sora', sans-serif;
+            font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.8px; 
+            color: var(--gray); padding: 12px 20px; text-align: left; font-weight: 700;
+            border-bottom: 1px solid var(--border);
+        }
+        .device-table td { padding: 16px 20px; font-size: 13px; border-bottom: 1px solid rgba(0,0,0,0.04); vertical-align: middle; }
+        .device-table tr:last-child td { border-bottom: none; }
+        .device-table tr:hover td { background: rgba(0,0,0,0.01); }
+
+        .device-id { font-family: 'Sora', sans-serif; font-weight: 700; color: var(--text-main); display: block; }
+        .device-sn { font-size: 11px; color: var(--gray-light); font-weight: 600; text-transform: uppercase; }
+
+        .badge { 
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; 
+        }
+        .badge-online { background: rgba(16,185,129,0.1); color: var(--green); }
+        .badge-offline { background: rgba(107,114,128,0.1); color: var(--gray); }
+        .dot { width: 6px; height: 6px; border-radius: 50%; }
+
+        .action-btns { display: flex; gap: 6px; justify-content: flex-end; }
+        .icon-btn {
+            width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;
+            background: white; color: var(--gray);
+        }
+        .icon-btn:hover { background: var(--surface); color: var(--red); border-color: var(--red-light); }
+
+    </style>
+</head>
+<body>
+
+<div class="main">
+    <div class="topbar">
+        <div class="topbar-left">
+            <span>Infrastructure</span> / Device Management
+        </div>
+        <div class="topbar-right">
+            <div class="avatar">AS</div>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="action-bar">
+            <div class="search-container">
+                <svg width="16" height="16" fill="none" stroke="var(--gray-light)" stroke-width="2.5" viewBox="0 0 24 24">
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input type="text" placeholder="Search by ID, location or type...">
+            </div>
+            
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-outline">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M3 4h18M6 10h12M9 16h6"/></svg> Filter
+                </button>
+                <button class="btn btn-red">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Add Device
+                </button>
+            </div>
+        </div>
+
+        <div class="card">
+            <table class="device-table">
+                <thead>
+                    <tr>
+                        <th>Device Details</th>
+                        <th>Type</th>
+                        <th>Installation Location</th>
+                        <th>Status</th>
+                        <th>Last Active</th>
+                        <th style="text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <span class="device-id">BFP-001-TLY</span>
+                            <span class="device-sn">SN: 992834-X</span>
+                        </td>
+                        <td><strong>Smoke Detector</strong></td>
+                        <td style="color: var(--text-sub);">Talisay Central Elem.</td>
+                        <td>
+                            <span class="badge badge-online">
+                                <span class="dot" style="background: var(--green);"></span> Online
+                            </span>
+                        </td>
+                        <td style="color: var(--gray); font-style: italic;">2 mins ago</td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="icon-btn">
+                                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                </button>
+                                <button class="icon-btn">
+                                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

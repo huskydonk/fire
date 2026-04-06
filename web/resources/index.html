@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>F.I.E.R.C.E</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --red: #D32F2F;
+    --red-dark: #B71C1C;
+    --red-light: #EF5350;
+    --red-muted: rgba(211,47,47,0.09);
+    --blue: #2563EB;
+    --blue-light: #3B82F6;
+    --blue-muted: rgba(37,99,235,0.1);
+    --page-bg: #F5F6FA;
+    --sidebar-bg: #FFFFFF;
+    --card-bg: #FFFFFF;
+    --border: #E5E7EB;
+    --text-main: #111827;
+    --text-sub: #6B7280;
+    --gray: #6B7280;
+    --gray-light: #9CA3AF;
+    --green: #10B981;
+    --orange: #F59E0B;
+    --surface: #F3F4F6;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--page-bg);
+    color: var(--text-main);
+    display: flex;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── ICON HELPERS ── */
+  .icon { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .icon img { display: block; }
+  .icon-white img { filter: brightness(0) invert(1); }
+  .icon-red img { filter: invert(19%) sepia(93%) saturate(2487%) hue-rotate(346deg) brightness(83%) contrast(94%); }
+  .icon-gray img { filter: invert(46%) sepia(9%) saturate(357%) hue-rotate(178deg) brightness(92%) contrast(87%); }
+  .icon-blue img { filter: invert(28%) sepia(94%) saturate(1718%) hue-rotate(211deg) brightness(97%) contrast(94%); }
+  .icon-green img { filter: invert(56%) sepia(72%) saturate(453%) hue-rotate(113deg) brightness(96%) contrast(91%); }
+  .icon-orange img { filter: invert(71%) sepia(63%) saturate(618%) hue-rotate(2deg) brightness(102%) contrast(96%); }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 240px; min-height: 100vh;
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    position: fixed; left: 0; top: 0; bottom: 0;
+    z-index: 100;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.05);
+  }
+
+  .sidebar-logo {
+    display: flex; align-items: center; gap: 10px;
+    padding: 18px 16px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo-badge {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--surface);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; border: 2px solid var(--border);
+    overflow: hidden;
+  }
+
+  .sidebar-brand { font-size: 12.5px; font-weight: 700; color: var(--text-main); line-height: 1.3; }
+  .sidebar-brand span { font-weight: 400; color: var(--gray); font-size: 11px; display: block; }
+
+  .sidebar-section {
+    padding: 18px 16px 6px;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 1.5px; color: var(--gray-light);
+    text-transform: uppercase;
+  }
+
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 16px; margin: 2px 8px;
+    border-radius: 10px; cursor: pointer;
+    font-size: 13.5px; font-weight: 500;
+    color: var(--gray); transition: all 0.2s;
+    position: relative;
+  }
+
+  .nav-item:hover { background: var(--surface); color: var(--text-main); }
+  .nav-item:hover .nav-icon img { filter: invert(14%) sepia(0%) saturate(0%) brightness(100%); }
+  .nav-item.active { background: var(--red); color: #fff; box-shadow: 0 4px 12px rgba(211,47,47,0.25); }
+  .nav-item.active .nav-icon img { filter: brightness(0) invert(1); }
+  .nav-item .nav-icon { width: 18px; display: flex; align-items: center; justify-content: center; }
+  .nav-item .arrow { margin-left: auto; font-size: 13px; color: var(--gray-light); transition: transform 0.25s ease; display: inline-block; }
+  .nav-item.active .arrow { color: rgba(255,255,255,0.7); }
+
+  /* ── BFP DROPDOWN ── */
+  .nav-item.has-dropdown { flex-wrap: wrap; }
+
+  .nav-item.has-dropdown.open .arrow {
+    transform: rotate(90deg);
+  }
+
+  .dropdown-menu {
+    display: none;
+    flex-direction: column;
+    width: calc(100% + 0px);
+    margin-top: 6px;
+    margin-left: -30px; /* align under text, past icon */
+    border-left: 2px solid rgba(211,47,47,0.25);
+    padding-left: 0;
+    overflow: hidden;
+  }
+
+  .nav-item.has-dropdown.open .dropdown-menu {
+    display: flex;
+  }
+
+  .dropdown-item {
+    display: flex; align-items: center; gap: 9px;
+    padding: 8px 12px 8px 14px;
+    font-size: 12.5px; font-weight: 500;
+    color: var(--gray); cursor: pointer;
+    border-radius: 7px;
+    margin: 1px 0;
+    transition: background 0.15s, color 0.15s;
+    width: 100%;
+  }
+
+  .dropdown-item:hover {
+    background: var(--red-muted);
+    color: var(--red);
+  }
+
+  .dropdown-item.active-sub {
+    background: var(--red-muted);
+    color: var(--red);
+    font-weight: 600;
+  }
+
+  .dropdown-item img {
+    filter: invert(46%) sepia(9%) saturate(357%) hue-rotate(178deg) brightness(92%) contrast(87%);
+    flex-shrink: 0;
+  }
+
+  .dropdown-item:hover img,
+  .dropdown-item.active-sub img {
+    filter: invert(19%) sepia(93%) saturate(2487%) hue-rotate(346deg) brightness(83%) contrast(94%);
+  }
+
+  /* keep full width of nav-item when open */
+  .nav-item.has-dropdown > .nav-icon,
+  .nav-item.has-dropdown > .arrow {
+    flex-shrink: 0;
+  }
+
+  .nav-item-row {
+    display: flex; align-items: center; gap: 12px;
+    width: 100%;
+  }
+
+  .sidebar-bottom { margin-top: auto; padding: 16px; border-top: 1px solid var(--border); }
+
+  .logout-btn {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--red); color: white; border: none;
+    border-radius: 10px; padding: 11px 16px; width: 100%;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 600; transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(211,47,47,0.2);
+  }
+  .logout-btn:hover { background: var(--red-dark); }
+
+  /* ── MAIN ── */
+  .main { margin-left: 240px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    background: #fff; border-bottom: 1px solid var(--border);
+    padding: 0 24px; height: 58px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 50;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+
+  .topbar-left { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gray); }
+  .topbar-left span { color: var(--text-main); font-weight: 600; }
+  .topbar-right { display: flex; align-items: center; gap: 14px; }
+
+  .topbar-date {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--surface); padding: 6px 12px;
+    border-radius: 8px; border: 1px solid var(--border);
+    font-size: 12px; color: var(--text-main); font-weight: 500;
+  }
+
+  .avatar {
+    width: 32px; height: 32px; background: var(--red);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: white; cursor: pointer;
+    font-family: 'Sora', sans-serif;
+  }
+
+  /* ── HERO BANNER ── */
+  .hero-banner {
+    background: linear-gradient(135deg, var(--red-dark) 0%, var(--red) 55%, #EF5350 100%);
+    padding: 20px 28px; display: flex; align-items: center; gap: 16px;
+    position: relative; overflow: hidden;
+  }
+
+  .hero-banner::before {
+    content: ''; position: absolute; right: -40px; top: -40px;
+    width: 200px; height: 200px; background: rgba(255,255,255,0.07); border-radius: 50%;
+  }
+
+  .hero-banner::after {
+    content: ''; position: absolute; right: 80px; bottom: -60px;
+    width: 160px; height: 160px; background: rgba(255,255,255,0.04); border-radius: 50%;
+  }
+
+  .hero-seal {
+    width: 67px; height: 67px; border-radius: 50%;
+    background: rgba(255,255,255,0.15); border: 3px solid rgba(255,255,255,0.35);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .hero-text h1 { font-family: 'Sora', sans-serif; font-size: 22px; font-weight: 800; color: white; letter-spacing: -0.3px; }
+  .hero-text p { font-size: 13px; color: rgba(255,255,255,0.78); margin-top: 3px; }
+
+  /* ── CONTENT ── */
+  .content { padding: 22px 24px; flex: 1; }
+
+  /* ── SECTION HEADER ── */
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .section-title { font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 600; color: var(--text-main); }
+
+  .time-tabs {
+    display: flex; gap: 4px; background: var(--surface);
+    padding: 4px; border-radius: 8px; border: 1px solid var(--border);
+  }
+
+  .time-tab {
+    padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 500;
+    cursor: pointer; color: var(--gray); border: none; background: transparent;
+    font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+  }
+
+  .time-tab.active { background: var(--red); color: white; box-shadow: 0 2px 6px rgba(211,47,47,0.25); }
+
+  .select-date-btn {
+    display: flex; align-items: center; gap: 6px;
+    background: #fff; border: 1px solid var(--border);
+    border-radius: 8px; padding: 6px 12px;
+    font-size: 12px; color: var(--text-sub); cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .export-btn {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--red); border: none; color: white;
+    padding: 7px 14px; border-radius: 8px; font-size: 12.5px; font-weight: 600;
+    cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+    box-shadow: 0 3px 8px rgba(211,47,47,0.2);
+  }
+  .export-btn:hover { background: var(--red-dark); }
+
+  /* ── STAT CARDS ── */
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 16px; }
+
+  .stat-card {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px;
+    padding: 16px; display: flex; align-items: center; justify-content: space-between;
+    transition: all 0.22s; box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+
+  .stat-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.1); transform: translateY(-2px); }
+
+  .stat-label { font-size: 11px; color: var(--gray); font-weight: 500; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .stat-value { font-family: 'Sora', sans-serif; font-size: 22px; font-weight: 800; color: var(--text-main); line-height: 1; }
+  .stat-change { font-size: 11px; margin-top: 5px; display: flex; align-items: center; gap: 3px; font-weight: 500; }
+  .stat-change.up { color: var(--green); }
+  .stat-change.down { color: var(--red-light); }
+
+  .stat-icon-box {
+    width: 46px; height: 46px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+
+  .stat-card.blue-card .stat-value { color: var(--blue); }
+
+  /* ── ALERT BOX ── */
+  .alert-box {
+    background: var(--card-bg); border: 1.5px solid rgba(211,47,47,0.28);
+    border-radius: 14px; padding: 18px 20px; margin-bottom: 20px;
+    display: flex; align-items: center; gap: 20px;
+    box-shadow: 0 2px 12px rgba(211,47,47,0.08);
+    animation: alertPulse 2.5s ease-in-out infinite;
+  }
+
+  @keyframes alertPulse {
+    0%,100% { box-shadow: 0 2px 12px rgba(211,47,47,0.08); }
+    50% { box-shadow: 0 2px 22px rgba(211,47,47,0.2); }
+  }
+
+  .alert-priority { font-size: 10.5px; font-weight: 700; letter-spacing: 1.5px; color: var(--red); text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+
+  .alert-icon-wrap {
+    width: 60px; height: 60px; background: var(--white-muted); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid rgba(211,47,47,0.18); flex-shrink: 0;
+    animation: iconPop 2s ease-in-out infinite;
+  }
+
+  @keyframes iconPop { 0%,100% { transform: scale(1); } 50% { transform: scale(1.07); } }
+
+  .alert-info h3 { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 700; color: var(--text-main); }
+  .alert-info p { font-size: 13px; color: var(--gray); margin-top: 3px; display: flex; align-items: center; gap: 5px; }
+  .alert-info .ago { font-size: 12px; color: var(--red); margin-top: 4px; font-weight: 500; display: flex; align-items: center; gap: 4px; }
+
+  .tap-alert-btn {
+    margin-left: auto; background: var(--red); color: white; border: none;
+    padding: 12px 26px; border-radius: 10px; font-family: 'Sora', sans-serif;
+    font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 4px 14px rgba(211,47,47,0.3); flex-shrink: 0;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .tap-alert-btn:hover { background: var(--red-dark); transform: scale(1.02); }
+
+  /* ── TWO COL ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+
+  .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+
+  .card-title {
+    font-family: 'Sora', sans-serif; font-size: 13.5px; font-weight: 700;
+    color: var(--text-main); margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  /* ── BAR CHART ── */
+  .bar-chart { display: flex; align-items: flex-end; gap: 5px; height: 140px; padding-bottom: 4px; }
+  .bar-group { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+  .bar { width: 100%; border-radius: 5px 5px 0 0; transition: all 0.25s; cursor: pointer; }
+  .bar.red-bar { background: linear-gradient(180deg, var(--red-light) 0%, var(--red) 100%); }
+  .bar.gray-bar { background: #E5E7EB; }
+  .bar:hover { opacity: 0.78; }
+  .bar-label { font-size: 9px; color: var(--gray-light); text-align: center; font-weight: 500; }
+
+  .chart-icon-btns button {
+    background: none; border: 1px solid var(--border); border-radius: 6px;
+    padding: 4px 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ── MAP ── */
+  .map-box {
+    background: #DDE4EC; border-radius: 10px; height: 160px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden; border: 1px solid var(--border);
+  }
+
+  .map-grid {
+    position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+
+  .map-roads { position: absolute; inset: 0; }
+
+  .map-marker { position: absolute; display: flex; flex-direction: column; align-items: center; z-index: 2; }
+
+  .pin {
+    width: 28px; height: 28px; background: var(--red);
+    border-radius: 50% 50% 50% 0; transform: rotate(-45deg);
+    box-shadow: 0 0 16px rgba(211,47,47,0.5);
+    animation: markerBounce 1.8s ease-in-out infinite;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .pin-inner { width: 10px; height: 10px; background: white; border-radius: 50%; transform: rotate(45deg); }
+
+  @keyframes markerBounce {
+    0%,100% { transform: rotate(-45deg) translateY(0); }
+    50% { transform: rotate(-45deg) translateY(-6px); }
+  }
+
+  .map-popup {
+    position: absolute; top: 8px; background: white; color: var(--text-main);
+    border-radius: 8px; padding: 7px 12px; font-size: 11px; font-weight: 600;
+    white-space: nowrap; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 3;
+    border: 1px solid var(--border);
+  }
+
+  .map-popup::after {
+    content: ''; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
+    border: 6px solid transparent; border-bottom: none; border-top-color: white;
+  }
+
+  /* ── INCIDENT TABLE ── */
+  .incident-table { width: 100%; border-collapse: collapse; }
+  .incident-table th { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--gray-light); padding: 8px 10px; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border); }
+  .incident-table td { padding: 10px 10px; font-size: 13px; border-bottom: 1px solid rgba(0,0,0,0.04); vertical-align: middle; color: var(--text-main); }
+  .incident-table tr:last-child td { border-bottom: none; }
+  .incident-table tr:hover td { background: var(--surface); }
+
+  .badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .badge.active { background: rgba(211,47,47,0.1); color: var(--red); }
+  .badge.resolved { background: rgba(16,185,129,0.1); color: var(--green); }
+  .badge.pending { background: rgba(245,158,11,0.1); color: var(--orange); }
+
+  /* ── COLLECTIONS ── */
+  .collection-row { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
+  .collection-row:last-child { border-bottom: none; }
+  .collection-label { font-size: 13px; color: var(--text-sub); min-width: 115px; display: flex; align-items: center; gap: 7px; }
+  .collection-bar-wrap { flex: 1; height: 6px; background: var(--surface); border-radius: 3px; margin: 0 12px; overflow: hidden; border: 1px solid var(--border); }
+  .collection-bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--red-dark), var(--red-light)); }
+  .collection-value { font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 700; color: var(--text-main); min-width: 65px; text-align: right; }
+
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: var(--surface); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════ SIDEBAR ══════════════════════ -->
+<aside class="sidebar">
+
+  <div class="sidebar-logo">
+    <div class="logo-badge">
+      <img src="image/bfplogo.png" alt="bfp_logo" style="width:34px;height: 34px;" class="icon-red">
+    </div>
+    <div class="sidebar-brand">
+      BFP Dashboard
+      <span>Municipality of Daet</span>
+    </div>
+  </div>
+
+  <div class="sidebar-section">BFP Dashboard</div>
+
+  <div class="nav-item active">
+    <span class="nav-icon">
+      <img src="image/icons8-dashboard-24.png" alt="dashboard" style="width:18px;height:18px;">
+    </span>
+    Dashboard
+  </div>
+
+  <!-- BFP Management with Dropdown -->
+  <div class="nav-item has-dropdown" id="bfp-nav">
+    <div class="nav-item-row">
+      <span class="nav-icon">
+        <img src="image/icons8-shield-24.png" alt="bfp" style="width:18px;height:18px;" class="icon-gray">
+      </span>
+      BFP Management
+      <span class="arrow">›</span>
+    </div>
+
+    <div class="dropdown-menu">
+      <div class="dropdown-item" data-page="User Management">
+        <img src="https://img.icons8.com/m_outlined/16/user.png" alt="user" width="15" height="15">
+        User Management
+      </div>
+      <div class="dropdown-item" data-page="BFP Map">
+        <img src="https://img.icons8.com/m_outlined/16/map-marker.png" alt="map" width="15" height="15">
+        BFP Map
+      </div>
+      <div class="dropdown-item" data-page="Personnel">
+        <img src="https://img.icons8.com/m_outlined/16/person-male.png" alt="personnel" width="15" height="15">
+        Personnel
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-item">
+    <span class="nav-icon">
+      <img src="image/icons8-analytics-24.png" alt="analytics" style="width:18px;height:18px;" class="icon-gray">
+    </span>
+    Analytic Report
+  </div>
+
+  <div class="nav-item">
+    <span class="nav-icon">
+      <img src="image/icons8-receipt-24.png" alt="transactions" style="width:18px;height:18px;" class="icon-gray">
+    </span>
+    Transactions
+  </div>
+
+  <div class="nav-item">
+    <span class="nav-icon">
+      <img src="image/icons8-iot-sensor-24.png" alt="device" style="width:18px;height:18px;" class="icon-gray">
+    </span>
+    System Device
+  </div>
+
+  <div class="nav-item">
+    <span class="nav-icon">
+      <img src="image/icons8-setting-24.png" alt="setting" style="width:18px;height:18px;" class="icon-gray">
+    </span>
+    Settings
+  </div>
+
+  <div class="sidebar-bottom">
+    <button class="logout-btn">
+      <img src="image/icons8-logout-24.png" alt="logout" style="filter:brightness(0) invert(1); width:18px;height:18px;">
+      Logout
+    </button>
+  </div>
+</aside>
+
+<!-- ══════════════════════ MAIN ══════════════════════ -->
+<main class="main">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <span>Dashboard</span>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-date">
+        <img src="image/icons8-calendar-50.png" alt="cal" class="icon-gray" style="width:15px;height:15px;">
+        <span id="liveTime"></span>
+      </div>
+      <div class="avatar">AS</div>
+    </div>
+  </header>
+
+  <!-- HERO BANNER -->
+  <div class="hero-banner">
+    <div class="hero-seal">
+      <img src="image/bfplogo.png" alt="BFP Logo" style="width:62px; height:62px; object-fit:contain;">
+    </div>
+    <div class="hero-text">
+      <h1>Daet Fire Station</h1>
+      <p>Bureau of Fire Protection &nbsp;·&nbsp; F . I . E . R . C . E</p>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- OVERVIEW HEADER -->
+    <div class="section-header">
+      <span class="section-title">Overview</span>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <div class="time-tabs">
+          <button class="time-tab">Days</button>
+          <button class="time-tab active">Months</button>
+          <button class="time-tab">Year</button>
+        </div>
+        <button class="select-date-btn">
+          <img src="image/icons8-calendar-50.png" alt="cal" class="icon-gray" style="width:14px;height:14px;">
+          Select Date
+          <span style="color:var(--gray-light);font-size:11px;">▾</span>
+        </button>
+        <button class="export-btn">
+          <img src="image/icons8-export-24.png" alt="export" style="filter:brightness(0) invert(1);width:16px;height:16px;">
+          Export
+        </button>
+      </div>
+    </div>
+
+    <!-- LGU STAT CARDS (2 columns) -->
+    <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr);">
+      <div class="stat-card">
+        <div>
+          <div class="stat-label">Registrants</div>
+          <div class="stat-value">00</div>
+        </div>
+        <div class="stat-icon-box bg-blue-muted">
+          <img src="image/icons8-queue-24.png" alt="registrants" class="icon-blue" width="26" height="26">
+        </div>
+      </div>
+      <div class="stat-card">
+        <div>
+          <div class="stat-label">Residents</div>
+          <div class="stat-value">00</div>
+        </div>
+        <div class="stat-icon-box bg-red-muted">
+          <img src="image/icons8-house-24.png" alt="residents" class="icon-red" width="26" height="26">
+        </div>
+      </div>
+    </div>
+
+    <!-- BFP STAT CARDS (4 columns) -->
+    <div class="stats-grid" style="margin-bottom:20px;">
+      <div class="stat-card blue-card">
+        <div>
+          <div class="stat-label">Total Users</div>
+          <div class="stat-value">00</div>
+        </div>
+        <div class="stat-icon-box bg-blue-muted">
+          <img src="image/icons8-person-24.png" alt="users" class="icon-blue" width="26" height="26">
+        </div>
+      </div>
+      <div class="stat-card blue-card">
+        <div>
+          <div class="stat-label">Active Devices</div>
+          <div class="stat-value">00</div>
+        </div>
+        <div class="stat-icon-box bg-blue-muted">
+          <img src="https://img.icons8.com/?size=100&id=82759&format=png&color=000000" alt="devices" class="icon-blue" width="26" height="26">
+        </div>
+      </div>
+      <div class="stat-card blue-card">
+        <div>
+          <div class="stat-label">Active Alerts</div>
+          <div class="stat-value">00</div>
+        </div>
+        <div class="stat-icon-box bg-blue-muted">
+          <img src="image/icons8-bell-24.png" alt="alerts" class="icon-blue" width="26" height="26">
+        </div>
+      </div>
+      <div class="stat-card blue-card">
+        <div>
+          <div class="stat-label">Incidents this Month</div>
+          <div class="stat-value">00</div>
+        </div>
+        <div class="stat-icon-box bg-blue-muted">
+          <img src="image/icons8-analytics-24.png" alt="incidents" class="icon-blue" width="26" height="26">
+        </div>
+      </div>
+    </div>
+    
+    <!-- HIGH PRIORITY ALERT -->
+    <div class="alert-box">
+      <div style="flex:1;">
+        <div class="alert-priority">
+          <img src="image/icons8-bolt-24.png" alt="alert" class="icon-red" style="width:14px;height:14px;">
+          High Priority Alert
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div class="alert-icon-wrap">
+            <img src="image/fire.gif" alt="fire" class="icon-red" style="width:40px;height:40px;">
+          </div>
+          <div class="alert-info">
+            <h3>Fire Alert 001</h3>
+            <p>
+              <img src="image/icons8-location-24.png" alt="loc" class="icon-gray" style="width:14px;height:14px;">
+              123, Street, Talisay Camarines Norte
+            </p>
+            <div class="ago">
+              <img src="image/icons8-time-24.png" alt="time" class="icon-red" style="width:13px;height:13px;">
+              3 mins ago
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="tap-alert-btn">
+        <img src="https://img.icons8.com/m_outlined/18/alarm.png" alt="alert" style="filter:brightness(0) invert(1);width:18px;height:18px;">
+        Tap Alert
+      </button>
+    </div>
+
+    <!-- STATISTICS + MAP -->
+    <div class="two-col">
+
+      <div class="card">
+        <div class="card-title">
+          <img src="image/icons8-analytics-24.png" alt="stats" class="icon-red" style="width:16px;height:16px;">
+          Statistics
+          <div style="margin-left:auto;display:flex;gap:6px;" class="chart-icon-btns">
+            <button title="Line chart">
+              <img src="https://img.icons8.com/m_outlined/14/area-chart.png" alt="line" class="icon-gray" style="width:14px;height:14px;">
+            </button>
+            <button title="Bar chart">
+              <img src="https://img.icons8.com/m_outlined/14/bar-chart.png" alt="bar" class="icon-gray" style="width:14px;height:14px;">
+            </button>
+          </div>
+        </div>
+        <div class="bar-chart" id="barChart"></div>
+        <div style="margin-top:10px;">
+          <div style="background:var(--red);color:white;border-radius:6px;padding:4px 12px;font-size:12px;font-weight:600;display:inline-block;">67</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <img src="image/icons8-map-24.png" alt="map" class="icon-red" style="width:16px;height:16px;">
+          Map
+        </div>
+        <div class="map-box">
+          <div class="map-grid"></div>
+          <svg class="map-roads" viewBox="0 0 400 160" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0,80 Q100,60 200,80 Q300,100 400,75" stroke="rgba(0,0,0,0.1)" stroke-width="10" fill="none"/>
+            <path d="M0,40 Q80,50 160,35 Q240,20 400,45" stroke="rgba(0,0,0,0.08)" stroke-width="6" fill="none"/>
+            <path d="M100,0 Q120,80 110,160" stroke="rgba(0,0,0,0.07)" stroke-width="5" fill="none"/>
+            <path d="M250,0 Q260,80 255,160" stroke="rgba(0,0,0,0.06)" stroke-width="5" fill="none"/>
+            <path d="M0,120 Q150,110 300,125 Q360,130 400,115" stroke="rgba(0,0,0,0.07)" stroke-width="5" fill="none"/>
+          </svg>
+        </div>
+        <div style="margin-top:10px;font-size:12px;color:var(--gray);display:flex;align-items:center;gap:5px;">
+          <img src="https://img.icons8.com/m_outlined/14/map-marker.png" alt="pin" class="icon-red" style="width:14px;height:14px;">
+          <strong style="color:var(--text-main);">Manila</strong> &nbsp;·&nbsp;
+          <span style="color:var(--blue);cursor:pointer;font-weight:500;">View larger map ›</span>
+        </div>
+      </div>
+
+    </div><!-- /two-col stats+map -->
+
+    <!-- COLLECTIONS + INCIDENT LOGS -->
+    <div class="two-col">
+
+      <div class="card">
+        <div class="card-title">
+          <img src="image/icons8-money-24.png" alt="collections" class="icon-red" style="width:16px;height:16px;">
+          Collections
+        </div>
+        <div id="collectionsData"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <img src="image/icons8-fire-24.png" alt="logs" class="icon-red" style="width:16px;height:16px;">
+          BFP Incident Logs
+        </div>
+        <table class="incident-table">
+          <thead>
+            <tr>
+              <th>Alert ID</th>
+              <th>Location</th>
+              <th>Time</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:600;">Fire Alert 001</td>
+              <td style="color:var(--gray);font-size:12px;">Talisay, CN</td>
+              <td style="color:var(--gray);font-size:12px;">3 mins ago</td>
+              <td><span class="badge active">Active</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div><!-- /two-col collections+logs -->
+
+  </div><!-- /content -->
+</main>
+
+<script>
+  /* ── LIVE TIME ── */
+  function updateTime() {
+    const now = new Date();
+    document.getElementById('liveTime').textContent =
+      now.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) +
+      ' | ' + now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+  }
+  updateTime(); setInterval(updateTime, 1000);
+
+  /* ── BAR CHART ── */
+  const labels = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const values = [2,7,0,0,0,0,0,0,0,0,0,0];
+  const maxV = Math.max(...values);
+  const chart = document.getElementById('barChart');
+  labels.forEach((l,i)=>{
+    const h = Math.round((values[i]/maxV)*125);
+    const hG = Math.round(h*0.52);
+    const g = document.createElement('div');
+    g.className = 'bar-group';
+    g.innerHTML = `
+      <div style="display:flex;gap:2px;align-items:flex-end;flex:1;width:100%;">
+        <div class="bar gray-bar" style="height:${hG}px;flex:1;"></div>
+        <div class="bar red-bar" style="height:${h}px;flex:1;" title="${values[i]}k"></div>
+      </div>
+      <div class="bar-label">${l}</div>`;
+    chart.appendChild(g);
+  });
+
+  /* ── COLLECTIONS ── */
+  const cols = [
+    { label:'Device', icon:'merchant-account', value:'₱000,000', pct:85 },
+  ];
+  const colEl = document.getElementById('collectionsData');
+  cols.forEach(c => {
+    colEl.innerHTML += `
+      <div class="collection-row">
+        <div class="collection-label">
+          <img src="https://img.icons8.com/m_outlined/14/${c.icon}.png" alt="${c.label}"
+               style="width:14px;height:14px;filter:invert(46%) sepia(9%) saturate(357%) hue-rotate(178deg) brightness(92%) contrast(87%);">
+          ${c.label}
+        </div>
+        <div class="collection-bar-wrap">
+          <div class="collection-bar-fill" style="width:${c.pct}%;"></div>
+        </div>
+        <div class="collection-value">${c.value}</div>
+      </div>`;
+  });
+
+  /* ── TIME TABS ── */
+  document.querySelectorAll('.time-tab').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.time-tab').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  /* ── NAV TOGGLE (excluding BFP dropdown parent) ── */
+  document.querySelectorAll('.nav-item:not(.has-dropdown)').forEach(item => {
+    item.addEventListener('click', function() {
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  /* ── BFP MANAGEMENT DROPDOWN ── */
+  const bfpNav = document.getElementById('bfp-nav');
+
+  bfpNav.addEventListener('click', function(e) {
+    // Don't toggle if clicking a dropdown sub-item
+    if (e.target.closest('.dropdown-item')) return;
+    this.classList.toggle('open');
+  });
+
+  // Dropdown sub-item clicks
+  document.querySelectorAll('.dropdown-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+      e.stopPropagation();
+      // Clear active on all nav items
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      // Clear active-sub on all dropdown items
+      document.querySelectorAll('.dropdown-item').forEach(d => d.classList.remove('active-sub'));
+      // Mark this sub-item active
+      this.classList.add('active-sub');
+      // Keep parent open and visually highlighted
+      bfpNav.classList.add('open');
+
+      console.log('Navigate to:', this.dataset.page);
+    });
+  });
+</script>
+</body>
+</html>
