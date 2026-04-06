@@ -685,22 +685,16 @@
       <div class="card">
         <div class="card-title">
           <img src="image/icons8-map-24.png" alt="map" class="icon-red" style="width:16px;height:16px;">
-          Map
+          Device Map
         </div>
-        <div class="map-box">
-          <div class="map-grid"></div>
-          <svg class="map-roads" viewBox="0 0 400 160" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0,80 Q100,60 200,80 Q300,100 400,75" stroke="rgba(0,0,0,0.1)" stroke-width="10" fill="none"/>
-            <path d="M0,40 Q80,50 160,35 Q240,20 400,45" stroke="rgba(0,0,0,0.08)" stroke-width="6" fill="none"/>
-            <path d="M100,0 Q120,80 110,160" stroke="rgba(0,0,0,0.07)" stroke-width="5" fill="none"/>
-            <path d="M250,0 Q260,80 255,160" stroke="rgba(0,0,0,0.06)" stroke-width="5" fill="none"/>
-            <path d="M0,120 Q150,110 300,125 Q360,130 400,115" stroke="rgba(0,0,0,0.07)" stroke-width="5" fill="none"/>
-          </svg>
-        </div>
-        <div style="margin-top:10px;font-size:12px;color:var(--gray);display:flex;align-items:center;gap:5px;">
-          <img src="https://img.icons8.com/m_outlined/14/map-marker.png" alt="pin" class="icon-red" style="width:14px;height:14px;">
-          <strong style="color:var(--text-main);">Manila</strong> &nbsp;·&nbsp;
-          <span style="color:var(--blue);cursor:pointer;font-weight:500;">View larger map ›</span>
+        <div id="indexGoogleMap" style="border-radius: 10px; height: 180px; overflow: hidden; border: 1px solid var(--border);"></div>
+        <div style="margin-top:10px;font-size:12px;color:var(--gray);display:flex;align-items:center;gap:5px;justify-content:space-between;">
+          <div style="display:flex;align-items:center;gap:5px;">
+            <img src="https://img.icons8.com/m_outlined/14/map-marker.png" alt="pin" class="icon-red" style="width:14px;height:14px;">
+            <strong style="color:var(--text-main);">Daet</strong> &nbsp;·&nbsp;
+            <span id="dashboardMarkerCount" style="color:var(--text-main);font-weight:500;">3 devices</span>
+          </div>
+          <span style="color:var(--blue);cursor:pointer;font-weight:500;" onclick="window.location.href='analytics.html'">Full map ›</span>
         </div>
       </div>
 
@@ -903,10 +897,210 @@
     }
   }
 
+  // Google Maps initialization for dashboard
+  let dashboardMap;
+  let dashboardMarkers = [];
+  let dashboardMapsLoaded = false;
+
+  function loadGoogleMapsAPI() {
+    return new Promise((resolve, reject) => {
+      if (window.google && window.google.maps) {
+        dashboardMapsLoaded = true;
+        resolve();
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyAzKuGLb-sSNsGoGb1rwobyZjqwKGOvCkQ';
+      script.async = true;
+      script.defer = true;
+      
+      script.onload = () => {
+        dashboardMapsLoaded = true;
+        resolve();
+      };
+      
+      script.onerror = () => {
+        console.warn('Google Maps API failed to load on dashboard.');
+        reject(new Error('Google Maps API failed'));
+      };
+      
+      document.head.appendChild(script);
+    });
+  }
+
+  async function initDashboardMap() {
+    try {
+      await loadGoogleMapsAPI();
+      
+      if (!dashboardMapsLoaded) {
+        showDashboardMapFallback();
+        return;
+      }
+
+      const daetCenter = { lat: 14.1144, lng: 121.9548 };
+
+      dashboardMap = new google.maps.Map(document.getElementById('indexGoogleMap'), {
+        zoom: 13,
+        center: daetCenter,
+        styles: [
+          {
+            featureType: 'all',
+            elementType: 'labels.text.fill',
+            stylers: [{ color: '#6B7280' }]
+          },
+          {
+            featureType: 'road',
+            elementType: 'geometry',
+            stylers: [{ color: '#E5E7EB' }]
+          },
+          {
+            featureType: 'water',
+            elementType: 'geometry',
+            stylers: [{ color: '#D1E7F1' }]
+          },
+          {
+            featureType: 'poi',
+            elementType: 'geometry',
+            stylers: [{ color: '#F3F4F6' }]
+          }
+        ]
+      });
+
+      loadDashboardDevices();
+    } catch (error) {
+      console.warn('Map initialization failed:', error);
+      showDashboardMapFallback();
+    }
+  }
+
+  async function loadDashboardDevices() {
+    try {
+      if (!getAuthToken()) return;
+
+      const data = await graphqlQuery(`
+        query {
+          devices {
+            id
+            deviceId
+            deviceType
+            location
+            status
+            serialNumber
+            lastActive
+            installationDate
+          }
+        }
+      `);
+
+      if (data.devices && data.devices.length > 0) {
+        displayDashboardDevices(data.devices.slice(0, 3));
+      } else {
+        displayDashboardDevices(getSampleDashboardDevices());
+      }
+    } catch (error) {
+      console.error('Error loading dashboard devices:', error);
+      displayDashboardDevices(getSampleDashboardDevices());
+    }
+  }
+
+  function displayDashboardDevices(devices) {
+    if (!dashboardMapsLoaded || !dashboardMap) return;
+
+    dashboardMarkers.forEach(marker => marker.setMap(null));
+    dashboardMarkers = [];
+
+    const locationCoords = {
+      'Talisay Central Elementary': { lat: 14.1280, lng: 121.9380 },
+      'City Hall Annex': { lat: 14.1100, lng: 121.9620 },
+      'Police Station': { lat: 14.0980, lng: 121.9510 },
+      'Hospital': { lat: 14.1200, lng: 121.9700 },
+      'University': { lat: 14.1350, lng: 121.9450 },
+      'Main Street': { lat: 14.1180, lng: 121.9500 },
+      'Building A': { lat: 14.1100, lng: 121.9600 },
+      'Fire Station': { lat: 14.1150, lng: 121.9520 }
+    };
+
+    devices.forEach(device => {
+      const coords = locationCoords[device.location] || { lat: 14.1144, lng: 121.9548 };
+      let markerColor = 'green';
+      if (device.status === 'offline') markerColor = 'red';
+      if (device.status === 'inactive') markerColor = 'orange';
+
+      const marker = new google.maps.Marker({
+        position: coords,
+        map: dashboardMap,
+        title: device.deviceId,
+        icon: `http://maps.google.com/mapfiles/ms/icons/${markerColor}-dot.png`,
+        animation: google.maps.Animation.DROP
+      });
+
+      marker.addListener('click', () => {
+        window.location.href = `analytics.html`;
+      });
+
+      dashboardMarkers.push(marker);
+    });
+
+    document.getElementById('dashboardMarkerCount').textContent = devices.length + ' device' + (devices.length !== 1 ? 's' : '');
+
+    if (dashboardMarkers.length > 0) {
+      const bounds = new google.maps.LatLngBounds();
+      dashboardMarkers.forEach(marker => bounds.extend(marker.getPosition()));
+      dashboardMap.fitBounds(bounds);
+    }
+  }
+
+  function getSampleDashboardDevices() {
+    return [
+      {
+        id: '1',
+        deviceId: 'BFP-001-TLY',
+        deviceType: 'Smoke Detector',
+        location: 'Talisay Central Elementary',
+        status: 'online'
+      },
+      {
+        id: '2',
+        deviceId: 'BFP-002-TLY',
+        deviceType: 'Heat Detector',
+        location: 'City Hall Annex',
+        status: 'online'
+      },
+      {
+        id: '3',
+        deviceId: 'BFP-003-TLY',
+        deviceType: 'CO Detector',
+        location: 'Police Station',
+        status: 'offline'
+      }
+    ];
+  }
+
+  function showDashboardMapFallback() {
+    const mapDiv = document.getElementById('indexGoogleMap');
+    const devices = getSampleDashboardDevices();
+    
+    mapDiv.style.background = '#F3F4F6';
+    mapDiv.style.display = 'flex';
+    mapDiv.style.alignItems = 'center';
+    mapDiv.style.justifyContent = 'center';
+    mapDiv.style.flexDirection = 'column';
+    mapDiv.style.gap = '10px';
+    
+    mapDiv.innerHTML = `
+      <div style="text-align: center; color: #6B7280;">
+        <p style="font-size: 12px; margin: 0;">📍 Showing ${devices.length} devices</p>
+        <p style="font-size: 11px; margin: 4px 0 0; color: #9CA3AF;">Click "Full map ›" for details</p>
+      </div>
+    `;
+  }
+
   // Initialize on page load
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', async () => {
     checkAuth();
     loadData();
+    initDashboardMap();
   });
 
   // Logout function
