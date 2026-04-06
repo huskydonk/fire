@@ -6,6 +6,7 @@
 <title>F.I.E.R.C.E</title>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
 <link href="assets/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/@apollo/client@3/dist/apollo-client.cjs"></script>
 <style>
   :root {
     --red: #D32F2F;
@@ -835,6 +836,84 @@
       bfpNav.classList.add('open');
     });
   });
+</script>
+
+<script src="assets/apollo-client.js"></script>
+<script>
+  // Check authentication
+  function checkAuth() {
+    if (!getAuthToken()) {
+      window.location.href = 'login.html';
+    }
+  }
+
+  // Load data from GraphQL API
+  async function loadData() {
+    try {
+      const data = await graphqlQuery(`
+        query {
+          devices {
+            id
+            deviceId
+            location
+            status
+          }
+          incidents {
+            id
+            incidentId
+            severity
+            status
+          }
+        }
+      `);
+
+      console.log('Devices:', data.devices);
+      console.log('Incidents:', data.incidents);
+      
+      // Update UI with data
+      if (data.devices) {
+        updateDeviceStatus(data.devices);
+      }
+      if (data.incidents) {
+        updateIncidents(data.incidents);
+      }
+    } catch (error) {
+      console.error('Failed to load data:', error);
+    }
+  }
+
+  function updateDeviceStatus(devices) {
+    const activeCount = devices.filter(d => d.status === 'active').length;
+    const inactiveCount = devices.filter(d => d.status === 'inactive').length;
+    
+    // Update device stats in UI
+    const statsElements = document.querySelectorAll('.stat-box');
+    if (statsElements[1]) {
+      statsElements[1].querySelector('.stat-number').textContent = activeCount;
+    }
+  }
+
+  function updateIncidents(incidents) {
+    const activeIncidents = incidents.filter(i => i.status === 'active').length;
+    
+    // Update incident stats
+    const statsElements = document.querySelectorAll('.stat-box');
+    if (statsElements[2]) {
+      statsElements[2].querySelector('.stat-number').textContent = activeIncidents;
+    }
+  }
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', () => {
+    checkAuth();
+    loadData();
+  });
+
+  // Logout function
+  function logout() {
+    clearAuthToken();
+    window.location.href = 'login.html';
+  }
 </script>
 </body>
 </html>

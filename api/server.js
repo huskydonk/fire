@@ -4,14 +4,14 @@ const cors = require('cors');
 require('dotenv').config();
 const { pool } = require('./db/connection');
 const { typeDefs, resolvers } = require('./graphql');
-const { authMiddleware } = require('./middleware/auth');
+const auth = require('./middleware/auth');
 
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(authMiddleware);
+app.use(auth);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
