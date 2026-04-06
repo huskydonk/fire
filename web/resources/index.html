@@ -28,14 +28,10 @@
     --surface: #F3F4F6;
   }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
   body {
     font-family: 'DM Sans', sans-serif;
     background: var(--page-bg);
     color: var(--text-main);
-    display: flex;
-    min-height: 100vh;
     overflow-x: hidden;
   }
 
@@ -54,10 +50,10 @@
     width: 240px; min-height: 100vh;
     background: var(--sidebar-bg);
     border-right: 1px solid var(--border);
-    display: flex; flex-direction: column;
     position: fixed; left: 0; top: 0; bottom: 0;
     z-index: 100;
     box-shadow: 2px 0 8px rgba(0,0,0,0.05);
+    overflow-y: auto;
   }
 
   .sidebar-logo {
@@ -113,7 +109,7 @@
     flex-direction: column;
     width: calc(100% + 0px);
     margin-top: 6px;
-    margin-left: -30px; /* align under text, past icon */
+    margin-left: -30px;
     border-left: 2px solid rgba(211,47,47,0.25);
     padding-left: 0;
     overflow: hidden;
@@ -155,7 +151,6 @@
     filter: invert(19%) sepia(93%) saturate(2487%) hue-rotate(346deg) brightness(83%) contrast(94%);
   }
 
-  /* keep full width of nav-item when open */
   .nav-item.has-dropdown > .nav-icon,
   .nav-item.has-dropdown > .arrow {
     flex-shrink: 0;
@@ -169,7 +164,7 @@
   .sidebar-bottom { margin-top: auto; padding: 16px; border-top: 1px solid var(--border); }
 
   .logout-btn {
-    display: flex; align-items: center; gap: 10px;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
     background: var(--red); color: white; border: none;
     border-radius: 10px; padding: 11px 16px; width: 100%;
     cursor: pointer; font-family: 'DM Sans', sans-serif;
@@ -179,7 +174,7 @@
   .logout-btn:hover { background: var(--red-dark); }
 
   /* ── MAIN ── */
-  .main { margin-left: 240px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+  .main { margin-left: 240px; min-height: 100vh; }
 
   /* ── TOPBAR ── */
   .topbar {
@@ -236,10 +231,10 @@
   .hero-text p { font-size: 13px; color: rgba(255,255,255,0.78); margin-top: 3px; }
 
   /* ── CONTENT ── */
-  .content { padding: 22px 24px; flex: 1; }
+  .content { padding: 22px 24px; }
 
   /* ── SECTION HEADER ── */
-  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
   .section-title { font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 600; color: var(--text-main); }
 
   .time-tabs {
@@ -273,8 +268,6 @@
   .export-btn:hover { background: var(--red-dark); }
 
   /* ── STAT CARDS ── */
-  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 16px; }
-
   .stat-card {
     background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px;
     padding: 16px; display: flex; align-items: center; justify-content: space-between;
@@ -303,6 +296,7 @@
     display: flex; align-items: center; gap: 20px;
     box-shadow: 0 2px 12px rgba(211,47,47,0.08);
     animation: alertPulse 2.5s ease-in-out infinite;
+    flex-wrap: wrap;
   }
 
   @keyframes alertPulse {
@@ -335,9 +329,6 @@
 
   .tap-alert-btn:hover { background: var(--red-dark); transform: scale(1.02); }
 
-  /* ── TWO COL ── */
-  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-
   .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
 
   .card-title {
@@ -353,7 +344,15 @@
   .bar.red-bar { background: linear-gradient(180deg, var(--red-light) 0%, var(--red) 100%); }
   .bar.gray-bar { background: #E5E7EB; }
   .bar:hover { opacity: 0.78; }
-  .bar-label { font-size: 9px; color: var(--gray-light); text-align: center; font-weight: 500; }
+  .bar-label { font-size: 9px; color: var(--gray-light); text-align: center; font-weight: 500; white-space: nowrap; }
+
+  @media (max-width: 768px) {
+    .bar-label { font-size: 8px; }
+  }
+
+  @media (max-width: 576px) {
+    .bar-label { font-size: 7px; }
+  }
 
   .chart-icon-btns button {
     background: none; border: 1px solid var(--border); border-radius: 6px;
@@ -423,6 +422,108 @@
   .collection-bar-wrap { flex: 1; height: 6px; background: var(--surface); border-radius: 3px; margin: 0 12px; overflow: hidden; border: 1px solid var(--border); }
   .collection-bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--red-dark), var(--red-light)); }
   .collection-value { font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 700; color: var(--text-main); min-width: 65px; text-align: right; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 992px) {
+    .sidebar {
+      width: 200px;
+    }
+    .main {
+      margin-left: 200px;
+    }
+    .stat-card {
+      padding: 12px;
+    }
+    .alert-box {
+      gap: 12px;
+      padding: 14px 16px;
+    }
+    .tap-alert-btn {
+      margin-left: 0;
+      margin-top: 10px;
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .sidebar {
+      width: 60px;
+      padding: 0;
+    }
+    .sidebar-logo,
+    .sidebar-section,
+    .sidebar-brand span,
+    .nav-item > *:not(.nav-icon):not(.arrow),
+    .sidebar-bottom {
+      display: none;
+    }
+    .sidebar-logo {
+      display: flex;
+      justify-content: center;
+      padding: 12px 0;
+    }
+    .logo-badge {
+      margin: 0;
+    }
+    .nav-item {
+      justify-content: center;
+      margin: 4px;
+      padding: 10px;
+    }
+    .nav-item-row {
+      justify-content: center;
+    }
+    .main {
+      margin-left: 60px;
+    }
+    .topbar {
+      padding: 0 12px;
+      height: 50px;
+    }
+    .topbar-left,
+    .topbar-date {
+      display: none;
+    }
+    .section-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .content {
+      padding: 12px;
+    }
+    .hero-banner {
+      padding: 12px 16px;
+    }
+    .hero-seal {
+      width: 50px;
+      height: 50px;
+    }
+    .hero-text h1 {
+      font-size: 18px;
+    }
+    .hero-text p {
+      font-size: 12px;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .sidebar {
+      display: none;
+    }
+    .main {
+      margin-left: 0;
+    }
+    .topbar {
+      height: 45px;
+    }
+    .alert-box {
+      flex-direction: column;
+    }
+    .tap-alert-btn {
+      width: 100%;
+    }
+  }
 
   ::-webkit-scrollbar { width: 5px; }
   ::-webkit-scrollbar-track { background: var(--surface); }
@@ -549,7 +650,7 @@
     <!-- OVERVIEW HEADER -->
     <div class="section-header">
       <span class="section-title">Overview</span>
-      <div style="display:flex;gap:10px;align-items:center;">
+      <div class="d-flex gap-3 align-items-center flex-wrap">
         <div class="time-tabs">
           <button class="time-tab">Days</button>
           <button class="time-tab active">Months</button>
@@ -568,75 +669,87 @@
     </div>
 
     <!-- LGU STAT CARDS (2 columns) -->
-    <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr);">
-      <div class="stat-card">
-        <div>
-          <div class="stat-label">Registrants</div>
-          <div class="stat-value">00</div>
-        </div>
-        <div class="stat-icon-box bg-blue-muted">
-          <img src="image/icons8-queue-24.png" alt="registrants" class="icon-blue" width="26" height="26">
+    <div class="row g-3 mb-3">
+      <div class="col-12 col-md-6">
+        <div class="stat-card">
+          <div>
+            <div class="stat-label">Registrants</div>
+            <div class="stat-value">00</div>
+          </div>
+          <div class="stat-icon-box">
+            <img src="image/icons8-queue-24.png" alt="registrants" class="icon-blue" width="26" height="26">
+          </div>
         </div>
       </div>
-      <div class="stat-card">
-        <div>
-          <div class="stat-label">Residents</div>
-          <div class="stat-value">00</div>
-        </div>
-        <div class="stat-icon-box bg-red-muted">
-          <img src="image/icons8-house-24.png" alt="residents" class="icon-red" width="26" height="26">
+      <div class="col-12 col-md-6">
+        <div class="stat-card">
+          <div>
+            <div class="stat-label">Residents</div>
+            <div class="stat-value">00</div>
+          </div>
+          <div class="stat-icon-box">
+            <img src="image/icons8-house-24.png" alt="residents" class="icon-red" width="26" height="26">
+          </div>
         </div>
       </div>
     </div>
 
     <!-- BFP STAT CARDS (4 columns) -->
-    <div class="stats-grid" style="margin-bottom:20px;">
-      <div class="stat-card blue-card">
-        <div>
-          <div class="stat-label">Total Users</div>
-          <div class="stat-value">00</div>
-        </div>
-        <div class="stat-icon-box bg-blue-muted">
-          <img src="image/icons8-person-24.png" alt="users" class="icon-blue" width="26" height="26">
-        </div>
-      </div>
-      <div class="stat-card blue-card">
-        <div>
-          <div class="stat-label">Active Devices</div>
-          <div class="stat-value">00</div>
-        </div>
-        <div class="stat-icon-box bg-blue-muted">
-          <img src="https://img.icons8.com/?size=100&id=82759&format=png&color=000000" alt="devices" class="icon-blue" width="26" height="26">
+    <div class="row g-3 mb-4">
+      <div class="col-12 col-sm-6 col-lg-3">
+        <div class="stat-card blue-card">
+          <div>
+            <div class="stat-label">Total Users</div>
+            <div class="stat-value">00</div>
+          </div>
+          <div class="stat-icon-box">
+            <img src="image/icons8-person-24.png" alt="users" class="icon-blue" width="26" height="26">
+          </div>
         </div>
       </div>
-      <div class="stat-card blue-card">
-        <div>
-          <div class="stat-label">Active Alerts</div>
-          <div class="stat-value">00</div>
-        </div>
-        <div class="stat-icon-box bg-blue-muted">
-          <img src="image/icons8-bell-24.png" alt="alerts" class="icon-blue" width="26" height="26">
+      <div class="col-12 col-sm-6 col-lg-3">
+        <div class="stat-card blue-card">
+          <div>
+            <div class="stat-label">Active Devices</div>
+            <div class="stat-value">00</div>
+          </div>
+          <div class="stat-icon-box">
+            <img src="https://img.icons8.com/?size=100&id=82759&format=png&color=000000" alt="devices" class="icon-blue" width="26" height="26">
+          </div>
         </div>
       </div>
-      <div class="stat-card blue-card">
-        <div>
-          <div class="stat-label">Incidents this Month</div>
-          <div class="stat-value">00</div>
+      <div class="col-12 col-sm-6 col-lg-3">
+        <div class="stat-card blue-card">
+          <div>
+            <div class="stat-label">Active Alerts</div>
+            <div class="stat-value">00</div>
+          </div>
+          <div class="stat-icon-box">
+            <img src="image/icons8-bell-24.png" alt="alerts" class="icon-blue" width="26" height="26">
+          </div>
         </div>
-        <div class="stat-icon-box bg-blue-muted">
-          <img src="image/icons8-analytics-24.png" alt="incidents" class="icon-blue" width="26" height="26">
+      </div>
+      <div class="col-12 col-sm-6 col-lg-3">
+        <div class="stat-card blue-card">
+          <div>
+            <div class="stat-label">Incidents this Month</div>
+            <div class="stat-value">00</div>
+          </div>
+          <div class="stat-icon-box">
+            <img src="image/icons8-analytics-24.png" alt="incidents" class="icon-blue" width="26" height="26">
+          </div>
         </div>
       </div>
     </div>
     
     <!-- HIGH PRIORITY ALERT -->
-    <div class="alert-box">
-      <div style="flex:1;">
+    <div class="alert-box mb-4">
+      <div class="flex-grow-1">
         <div class="alert-priority">
           <img src="image/icons8-bolt-24.png" alt="alert" class="icon-red" style="width:14px;height:14px;">
           High Priority Alert
         </div>
-        <div style="display:flex;align-items:center;gap:16px;">
+        <div class="d-flex align-items-center gap-3">
           <div class="alert-icon-wrap">
             <img src="image/fire.gif" alt="fire" class="icon-red" style="width:40px;height:40px;">
           </div>
@@ -660,92 +773,101 @@
     </div>
 
     <!-- STATISTICS + MAP -->
-    <div class="two-col">
+    <div class="row g-3 mb-4">
 
-      <div class="card">
-        <div class="card-title">
-          <img src="image/icons8-analytics-24.png" alt="stats" class="icon-red" style="width:16px;height:16px;">
-          Statistics
-          <div style="margin-left:auto;display:flex;gap:6px;" class="chart-icon-btns">
-            <button title="Line chart">
-              <img src="https://img.icons8.com/m_outlined/14/area-chart.png" alt="line" class="icon-gray" style="width:14px;height:14px;">
-            </button>
-            <button title="Bar chart">
-              <img src="https://img.icons8.com/m_outlined/14/bar-chart.png" alt="bar" class="icon-gray" style="width:14px;height:14px;">
-            </button>
+      <div class="col-12 col-lg-6">
+        <div class="card">
+          <div class="card-title">
+            <img src="image/icons8-analytics-24.png" alt="stats" class="icon-red" style="width:16px;height:16px;">
+            Statistics
+            <div style="margin-left:auto;display:flex;gap:6px;" class="chart-icon-btns">
+              <button title="Line chart">
+                <img src="https://img.icons8.com/m_outlined/14/area-chart.png" alt="line" class="icon-gray" style="width:14px;height:14px;">
+              </button>
+              <button title="Bar chart">
+                <img src="https://img.icons8.com/m_outlined/14/bar-chart.png" alt="bar" class="icon-gray" style="width:14px;height:14px;">
+              </button>
+            </div>
+          </div>
+          <div class="bar-chart" id="barChart"></div>
+          <div class="mt-3">
+            <div style="background:var(--red);color:white;border-radius:6px;padding:4px 12px;font-size:12px;font-weight:600;display:inline-block;">67</div>
           </div>
         </div>
-        <div class="bar-chart" id="barChart"></div>
-        <div style="margin-top:10px;">
-          <div style="background:var(--red);color:white;border-radius:6px;padding:4px 12px;font-size:12px;font-weight:600;display:inline-block;">67</div>
+      </div>
+
+      <div class="col-12 col-lg-6">
+        <div class="card">
+          <div class="card-title">
+            <img src="image/icons8-map-24.png" alt="map" class="icon-red" style="width:16px;height:16px;">
+            Map
+          </div>
+          <div class="map-box">
+            <div class="map-grid"></div>
+            <svg class="map-roads" viewBox="0 0 400 160" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0,80 Q100,60 200,80 Q300,100 400,75" stroke="rgba(0,0,0,0.1)" stroke-width="10" fill="none"/>
+              <path d="M0,40 Q80,50 160,35 Q240,20 400,45" stroke="rgba(0,0,0,0.08)" stroke-width="6" fill="none"/>
+              <path d="M100,0 Q120,80 110,160" stroke="rgba(0,0,0,0.07)" stroke-width="5" fill="none"/>
+              <path d="M250,0 Q260,80 255,160" stroke="rgba(0,0,0,0.06)" stroke-width="5" fill="none"/>
+              <path d="M0,120 Q150,110 300,125 Q360,130 400,115" stroke="rgba(0,0,0,0.07)" stroke-width="5" fill="none"/>
+            </svg>
+          </div>
+          <div style="margin-top:10px;font-size:12px;color:var(--gray);display:flex;align-items:center;gap:5px;">
+            <img src="https://img.icons8.com/m_outlined/14/map-marker.png" alt="pin" class="icon-red" style="width:14px;height:14px;">
+            <strong style="color:var(--text-main);">Manila</strong> &nbsp;·&nbsp;
+            <span style="color:var(--blue);cursor:pointer;font-weight:500;">View larger map ›</span>
+          </div>
         </div>
       </div>
 
-      <div class="card">
-        <div class="card-title">
-          <img src="image/icons8-map-24.png" alt="map" class="icon-red" style="width:16px;height:16px;">
-          Map
-        </div>
-        <div class="map-box">
-          <div class="map-grid"></div>
-          <svg class="map-roads" viewBox="0 0 400 160" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0,80 Q100,60 200,80 Q300,100 400,75" stroke="rgba(0,0,0,0.1)" stroke-width="10" fill="none"/>
-            <path d="M0,40 Q80,50 160,35 Q240,20 400,45" stroke="rgba(0,0,0,0.08)" stroke-width="6" fill="none"/>
-            <path d="M100,0 Q120,80 110,160" stroke="rgba(0,0,0,0.07)" stroke-width="5" fill="none"/>
-            <path d="M250,0 Q260,80 255,160" stroke="rgba(0,0,0,0.06)" stroke-width="5" fill="none"/>
-            <path d="M0,120 Q150,110 300,125 Q360,130 400,115" stroke="rgba(0,0,0,0.07)" stroke-width="5" fill="none"/>
-          </svg>
-        </div>
-        <div style="margin-top:10px;font-size:12px;color:var(--gray);display:flex;align-items:center;gap:5px;">
-          <img src="https://img.icons8.com/m_outlined/14/map-marker.png" alt="pin" class="icon-red" style="width:14px;height:14px;">
-          <strong style="color:var(--text-main);">Manila</strong> &nbsp;·&nbsp;
-          <span style="color:var(--blue);cursor:pointer;font-weight:500;">View larger map ›</span>
-        </div>
-      </div>
-
-    </div><!-- /two-col stats+map -->
+    </div><!-- /row stats+map -->
 
     <!-- COLLECTIONS + INCIDENT LOGS -->
-    <div class="two-col">
+    <div class="row g-3">
 
-      <div class="card">
-        <div class="card-title">
-          <img src="image/icons8-money-24.png" alt="collections" class="icon-red" style="width:16px;height:16px;">
-          Collections
+      <div class="col-12 col-lg-6">
+        <div class="card">
+          <div class="card-title">
+            <img src="image/icons8-money-24.png" alt="collections" class="icon-red" style="width:16px;height:16px;">
+            Collections
+          </div>
+          <div id="collectionsData"></div>
         </div>
-        <div id="collectionsData"></div>
       </div>
 
-      <div class="card">
-        <div class="card-title">
-          <img src="image/icons8-fire-24.png" alt="logs" class="icon-red" style="width:16px;height:16px;">
-          BFP Incident Logs
+      <div class="col-12 col-lg-6">
+        <div class="card">
+          <div class="card-title">
+            <img src="image/icons8-fire-24.png" alt="logs" class="icon-red" style="width:16px;height:16px;">
+            BFP Incident Logs
+          </div>
+          <table class="incident-table">
+            <thead>
+              <tr>
+                <th>Alert ID</th>
+                <th>Location</th>
+                <th>Time</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-weight:600;">Fire Alert 001</td>
+                <td style="color:var(--gray);font-size:12px;">Talisay, CN</td>
+                <td style="color:var(--gray);font-size:12px;">3 mins ago</td>
+                <td><span class="badge active">Active</span></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <table class="incident-table">
-          <thead>
-            <tr>
-              <th>Alert ID</th>
-              <th>Location</th>
-              <th>Time</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td style="font-weight:600;">Fire Alert 001</td>
-              <td style="color:var(--gray);font-size:12px;">Talisay, CN</td>
-              <td style="color:var(--gray);font-size:12px;">3 mins ago</td>
-              <td><span class="badge active">Active</span></td>
-            </tr>
-          </tbody>
-        </table>
       </div>
 
-    </div><!-- /two-col collections+logs -->
+    </div><!-- /row collections+logs -->
 
   </div><!-- /content -->
 </main>
 
+<script src="assets/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script>
   /* ── LIVE TIME ── */
   function updateTime() {
@@ -757,10 +879,16 @@
   updateTime(); setInterval(updateTime, 1000);
 
   /* ── BAR CHART ── */
-  const labels = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const fullLabels = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const shortLabels = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const values = [2,7,0,0,0,0,0,0,0,0,0,0];
   const maxV = Math.max(...values);
   const chart = document.getElementById('barChart');
+  
+  // Use shortened labels for screens smaller than 768px
+  const isMobile = window.innerWidth < 768;
+  const labels = isMobile ? shortLabels : fullLabels;
+  
   labels.forEach((l,i)=>{
     const h = Math.round((values[i]/maxV)*125);
     const hG = Math.round(h*0.52);
@@ -771,7 +899,7 @@
         <div class="bar gray-bar" style="height:${hG}px;flex:1;"></div>
         <div class="bar red-bar" style="height:${h}px;flex:1;" title="${values[i]}k"></div>
       </div>
-      <div class="bar-label">${l}</div>`;
+      <div class="bar-label" title="${fullLabels[i]}">${l}</div>`;
     chart.appendChild(g);
   });
 
