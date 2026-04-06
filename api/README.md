@@ -24,7 +24,7 @@ DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=fierce_db
 DB_USER=postgres
-DB_PASSWORD=dc1f0d66f0954ec493e1eee43e9b2ab8
+DB_PASSWORD=Admin123
 ```
 
 ### Step 3: Initialize Database Schema
