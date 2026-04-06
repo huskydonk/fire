@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Device Management | F.I.E.R.C.E</title>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <link href="assets/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
     <style>
         :root {
             --red: #D32F2F;
@@ -125,6 +126,23 @@
             background: white; color: var(--gray);
         }
         .icon-btn:hover { background: var(--surface); color: var(--red); border-color: var(--red-light); }
+
+        @media (max-width: 768px) {
+            .action-bar { flex-direction: column; align-items: stretch; }
+            .search-container { max-width: 100%; }
+            .device-table { font-size: 12px; }
+            .device-table td, .device-table th { padding: 10px 12px; }
+            .action-btns { flex-wrap: wrap; }
+        }
+
+        @media (max-width: 576px) {
+            .topbar { padding: 0 16px; }
+            .content { padding: 16px; }
+            .device-table th { display: none; }
+            .device-table tr { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; padding: 12px; }
+            .device-table td { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: none; }
+            .device-table td::before { content: attr(data-label); font-weight: 700; color: var(--gray); }
+        }
 
     </style>
 </head>

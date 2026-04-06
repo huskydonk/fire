@@ -446,7 +446,7 @@
 
   <div class="sidebar-section">BFP Dashboard</div>
 
-  <div class="nav-item active">
+  <div class="nav-item active" onclick="window.location.href='index.html';">
     <span class="nav-icon">
       <img src="image/icons8-dashboard-24.png" alt="dashboard" style="width:18px;height:18px;">
     </span>
@@ -464,43 +464,43 @@
     </div>
 
     <div class="dropdown-menu">
-      <div class="dropdown-item" data-page="User Management">
+      <div class="dropdown-item" onclick="window.location.href='usermanagement.html';">
         <img src="https://img.icons8.com/m_outlined/16/user.png" alt="user" width="15" height="15">
         User Management
       </div>
-      <div class="dropdown-item" data-page="BFP Map">
+      <div class="dropdown-item" onclick="window.location.href='index.html';">
         <img src="https://img.icons8.com/m_outlined/16/map-marker.png" alt="map" width="15" height="15">
         BFP Map
       </div>
-      <div class="dropdown-item" data-page="Personnel">
+      <div class="dropdown-item" onclick="window.location.href='usermanagement.html';">
         <img src="https://img.icons8.com/m_outlined/16/person-male.png" alt="personnel" width="15" height="15">
         Personnel
       </div>
     </div>
   </div>
 
-  <div class="nav-item">
+  <div class="nav-item" onclick="window.location.href='analytics.html';">
     <span class="nav-icon">
       <img src="image/icons8-analytics-24.png" alt="analytics" style="width:18px;height:18px;" class="icon-gray">
     </span>
     Analytic Report
   </div>
 
-  <div class="nav-item">
+  <div class="nav-item" onclick="window.location.href='transaction.html';">
     <span class="nav-icon">
       <img src="image/icons8-receipt-24.png" alt="transactions" style="width:18px;height:18px;" class="icon-gray">
     </span>
     Transactions
   </div>
 
-  <div class="nav-item">
+  <div class="nav-item" onclick="window.location.href='device.html';">
     <span class="nav-icon">
       <img src="image/icons8-iot-sensor-24.png" alt="device" style="width:18px;height:18px;" class="icon-gray">
     </span>
     System Device
   </div>
 
-  <div class="nav-item">
+  <div class="nav-item" onclick="window.location.href='settings.html';">
     <span class="nav-icon">
       <img src="image/icons8-setting-24.png" alt="setting" style="width:18px;height:18px;" class="icon-gray">
     </span>
@@ -805,7 +805,8 @@
 
   /* ── NAV TOGGLE (excluding BFP dropdown parent) ── */
   document.querySelectorAll('.nav-item:not(.has-dropdown)').forEach(item => {
-    item.addEventListener('click', function() {
+    item.addEventListener('click', function(e) {
+      // Don't prevent default for navigation
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
       this.classList.add('active');
     });
@@ -832,8 +833,6 @@
       this.classList.add('active-sub');
       // Keep parent open and visually highlighted
       bfpNav.classList.add('open');
-
-      console.log('Navigate to:', this.dataset.page);
     });
   });
 </script>

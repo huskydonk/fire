@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>F.I.E.R.C.E Analytics</title>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link href="assets/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
 <style>
   :root {
     --red: #D32F2F;
@@ -246,6 +247,31 @@
   ::-webkit-scrollbar { width: 5px; }
   ::-webkit-scrollbar-track { background: var(--surface); }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  @media (max-width: 768px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+    .three-col { grid-template-columns: repeat(2, 1fr); }
+    .content { padding: 16px 20px; }
+    .card { padding: 20px; }
+    .section-title { font-size: 12px; }
+    .bar-chart { height: 120px; }
+    .bar-label { font-size: 8px; }
+  }
+
+  @media (max-width: 576px) {
+    .topbar { padding: 0 16px; }
+    .stats-grid { grid-template-columns: 1fr; gap: 12px; }
+    .three-col { grid-template-columns: 1fr; }
+    .two-col { grid-template-columns: 1fr; }
+    .content { padding: 16px; }
+    .card { padding: 16px; }
+    .section-title { font-size: 11px; }
+    .bar-chart { height: 100px; gap: 3px; }
+    .bar-group { gap: 2px; }
+    .bar-label { font-size: 7px; }
+    .time-tabs { flex-wrap: wrap; }
+    .export-btn { padding: 5px 10px; font-size: 11px; }
+  }
 </style>
 </head>
 <body>
