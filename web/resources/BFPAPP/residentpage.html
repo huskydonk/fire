@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#ffffff"/>
+    <meta name="description" content="Early Alert: Integrated IoT Fire Safety Solution for the Bureau of Fire Protection.">
+    <link rel="manifest" id="manifest">
+    <link rel="apple-touch-icon" href="https://placehold.co/192x192/003399/FFFFFF?text=BFP">
+
+    <title>BFP Early Alert</title>
+    
+    <!-- Leaflet CSS for Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Custom Tailwind theme to match the design
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'bfp-red': '#C82828',
+                        'bfp-red-dark': '#B81C1C',
+                        'status-green': '#34A853',
+                        'stat-green': '#2EBF7F',
+                        'stat-red': '#EA4335',
+                        'resolved-green-bg': '#E6F4EA',
+                        'resolved-green-text': '#34A853',
+                        'active-red-bg': '#FCE8E6',
+                        'active-red-text': '#C5221F',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Ensure map tiles are not distorted */
+        .leaflet-tile-pane { image-rendering: pixelated; }
+    </style>
+</head>
+<body class="bg-gray-800 flex items-center justify-center min-h-screen font-sans">
+    <div class="w-full max-w-sm h-screen sm:h-[85vh] sm:rounded-lg shadow-2xl relative overflow-hidden">
+    <!-- Screen 1: Splash Screen -->
+    <main id="splash-screen" class="bg-white w-full h-full sm:rounded-lg flex flex-col items-center justify-center text-center p-8 cursor-pointer absolute inset-0 z-50">
+        <div class="flex-grow flex items-center justify-center">
+            <svg class="w-40 h-40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <g><path d="M50,5 L95,25 L95,75 L50,95 L5,75 L5,25 Z" fill="#003399"/><path d="M50,10 L90,30 L90,70 L50,90 L10,70 L10,30 Z" fill="#FFFFFF"/><path d="M50,15 L85,35 L85,65 L50,85 L15,65 L15,35 Z" fill="#D40000"/><circle cx="50" cy="50" r="20" fill="#FFD700"/><text x="50" y="55" font-family="Arial, sans-serif" font-size="10" fill="#000000" text-anchor="middle" font-weight="bold">BFP</text></g>
+            </svg>
+        </div>
+        <p class="text-gray-400 text-sm animate-pulse">Tap anywhere to continue</p>
+    </main>
+
+
+    <!-- Login Screen -->
+    <main id="login-screen" class="bg-white w-full h-full flex-col items-center justify-center p-8 hidden absolute inset-0 z-40">
+        <div class="text-center mb-8">
+            <svg class="w-24 h-24 mx-auto mb-4" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><g><path d="M50,5 L95,25 L95,75 L50,95 L5,75 L5,25 Z" fill="#003399"/><path d="M50,10 L90,30 L90,70 L50,90 L10,70 L10,30 Z" fill="#FFFFFF"/><path d="M50,15 L85,35 L85,65 L50,85 L15,65 L15,35 Z" fill="#D40000"/><circle cx="50" cy="50" r="20" fill="#FFD700"/><text x="50" y="55" font-family="Arial, sans-serif" font-size="10" fill="#000000" text-anchor="middle" font-weight="bold">BFP</text></g></svg>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">Welcome Back!</h2>
+            <p class="text-gray-600 text-sm">Sign in to continue</p>
+        </div>
+        <div class="w-full">
+            <form id="login-form" onsubmit="event.preventDefault();">
+                <div class="mb-4">
+                    <label for="username" class="block text-sm font-semibold text-gray-700 mb-2">Username</label>
+                    <input type="text" id="username" placeholder="Enter your username" class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-bfp-red focus:border-transparent transition-all">
+                </div>
+                <div class="mb-6">
+                    <label for="password" class="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+                    <input type="password" id="password" placeholder="Enter your password" class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-bfp-red focus:border-transparent transition-all">
+                    <a href="#" class="text-xs text-blue-600 hover:underline text-right block mt-2">Forgot Password?</a>
+                </div>
+                <button type="submit" class="w-full bg-gradient-to-br from-bfp-red to-bfp-red-dark text-white font-bold py-3 px-4 rounded-xl hover:shadow-lg hover:-translate-y-0.5 transition-all">Login</button>
+            </form>
+            <div class="my-6 flex items-center">
+                <div class="flex-grow border-t border-gray-300"></div>
+                <span class="flex-shrink mx-4 text-gray-500 text-sm">OR</span>
+                <div class="flex-grow border-t border-gray-300"></div>
+            </div>
+            <button id="google-login-btn" class="w-full bg-white text-gray-700 font-semibold py-3 px-4 border-2 border-gray-200 rounded-xl shadow-sm hover:bg-gray-50 hover:shadow-md transition-all flex items-center justify-center">
+                <svg class="w-5 h-5 mr-2" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039L38.485 11.54C34.783 7.844 29.697 5.5 24 5.5C11.696 5.5 1.5 15.696 1.5 28s10.196 22.5 22.5 22.5c11.133 0 20.375-8.23 21.611-18.847V20.083z"/>
+                    <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12.5 24 12.5c3.059 0 5.842 1.154 7.961 3.039L38.485 11.54C34.783 7.844 29.697 5.5 24 5.5C16.318 5.5 9.506 9.834 6.306 14.691z"/>
+                    <path fill="#4CAF50" d="M24 44.5c5.166 0 9.86-1.977 13.409-5.192l-6.19-4.819C29.211 35.091 26.715 36.5 24 36.5c-5.22 0-9.643-3.336-11.284-7.94l-6.522 5.025C9.506 39.166 16.318 44.5 24 44.5z"/>
+                    <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.14-4.062 5.534l6.19 4.819C42.018 35.398 44.5 30.01 44.5 24c0-1.588-.158-3.14-.44-4.639z"/>
+                </svg>
+                Sign in with Google
+            </button>
+        </div>
+    </main>
+    
+    <!-- App Container -->
+    <div id="app-container" class="w-full h-full hidden flex-col">
+        <!-- Main Content Area -->
+        <div id="main-content" class="w-full h-full flex flex-col flex-grow">
+            <!-- Header (Shared across screens) -->
+            <header class="bg-bfp-red text-white p-4 sm:rounded-t-lg shadow-md z-10">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-xl font-bold">Early Alert</h1>
+                        <p class="text-sm opacity-90">Fire Safety System</p>
+                    </div>
+                    <div class="text-right">
+                        <p id="current-date" class="text-sm font-semibold"></p>
+                        <p id="current-time" class="text-xs opacity-90"></p>
+                    </div>
+                </div>
+                <div class="mt-4 bg-status-green text-white p-3 rounded-lg flex items-center justify-between shadow">
+                    <div class="flex items-center">
+                        <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span class="font-semibold">All Systems Normal</span>
+                    </div>
+                    <span class="bg-white/30 text-xs font-bold px-3 py-1 rounded-full">SAFE</span>
+                </div>
+            </header>
+
+            <div class="flex-grow overflow-y-auto bg-gray-100 relative">
+                <!-- Screen 3: Home Dashboard -->
+                <main id="home-screen" class="app-screen p-4 space-y-4">
+                     <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-stat-green text-white p-4 rounded-lg shadow-lg"><div class="flex justify-between items-center"><p class="text-sm font-semibold">Active Devices</p><svg class="w-6 h-6 opacity-80" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 2Z"/></svg></div><p class="text-4xl font-bold mt-2">3</p></div>
+                        <div class="bg-stat-red text-white p-4 rounded-lg shadow-lg"><div class="flex justify-between items-center"><p class="text-sm font-semibold">Active Alerts</p><svg class="w-6 h-6 opacity-80" viewBox="0 0 24 24" fill="currentColor"><path d="M1 21H23L12 2L1 21ZM13 18H11V16H13V18ZM13 14H11V10H13V14Z"/></svg></div><p class="text-4xl font-bold mt-2">1</p></div>
+                    </div>
+                    <div class="bg-bfp-red text-white p-4 rounded-lg shadow-lg">
+                        <h3 class="font-bold flex items-center mb-3"><svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path></svg>Emergency Contacts</h3>
+                        <div class="flex items-center space-x-2"><select class="flex-grow bg-white/20 border border-white/30 text-white p-2.5 rounded-md focus:outline-none focus:ring-2 focus:ring-white appearance-none"><option>BFP Hotline</option><option>Local Fire Station</option><option>Ambulance</option></select><button class="call-trigger bg-white text-bfp-red-dark font-bold px-4 py-2.5 rounded-md flex items-center space-x-2 hover:bg-gray-200 transition-colors"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path></svg><span>Call</span></button></div>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-800 mb-3">Recent Activity</h2>
+                        <div class="space-y-3">
+                            <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-stat-red"><div class="flex justify-between items-start"><div class="flex items-center"><div class="bg-active-red-bg p-2 rounded-full mr-3"><svg class="w-6 h-6 text-stat-red" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.657 7.343A8 8 0 0118.657 17.657c-1.566 1.566-2.343 3.657-2.343 3.657-1-2-4-2.986-7-2.986 2.5.986 5 .5 7-2.986zM12 12a2 2 0 100-4 2 2 0 000 4z"></path></svg></div><div><h3 class="font-bold text-gray-800">Fire Alert</h3><p class="text-sm text-gray-500">2 mins ago</p></div></div><span class="bg-active-red-bg text-active-red-text text-xs font-bold px-3 py-1 rounded-full">ACTIVE</span></div><div class="mt-3 text-sm text-gray-600 space-y-1 pl-12"><p><span class="font-semibold text-gray-700">Device:</span> Kitchen</p><p><span class="font-semibold text-gray-700">Severity:</span> <span class="text-stat-red font-bold">High</span></p></div><div class="mt-4 flex space-x-2 pl-12"><button class="call-trigger flex-1 bg-bfp-red text-white font-bold py-2 px-4 rounded-lg text-sm hover:bg-bfp-red-dark transition-colors">Call BFP</button><button class="flex-1 bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded-lg text-sm hover:bg-gray-300 transition-colors">Dismiss</button></div></div>
+                            <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-status-green"><div class="flex justify-between items-start"><div class="flex items-center"><div class="bg-resolved-green-bg p-2 rounded-full mr-3"><svg class="w-6 h-6 text-status-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg></div><div><h3 class="font-bold text-gray-800">Smoke Alert</h3><p class="text-sm text-gray-500">1 hour ago</p></div></div><span class="bg-resolved-green-bg text-resolved-green-text text-xs font-bold px-3 py-1 rounded-full">RESOLVED</span></div><div class="mt-2 text-sm text-gray-600 space-y-1 pl-12"><p><span class="font-semibold text-gray-700">Device:</span> Living Room</p></div></div>
+                        </div>
+                    </div>
+                </main>
+
+                <!-- Screen 4: Devices -->
+                <main id="devices-screen" class="app-screen p-4 space-y-4 hidden">
+                    <div class="flex justify-between items-center mb-3">
+                        <h2 class="text-xl font-bold text-gray-800">Device Monitor</h2>
+                        <button id="add-device-screen-trigger" class="text-bfp-red"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg></button>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="bg-white p-4 rounded-lg shadow-md"><div class="flex justify-between items-start"><div><h3 class="font-bold text-gray-800">Living Room</h3><p class="text-sm text-gray-500">Ground Floor</p></div><span class="text-xs font-bold text-green-600">ONLINE</span></div><div class="mt-4 grid grid-cols-3 text-xs text-gray-600"><div><p class="font-semibold">Battery</p><p class="text-green-600 font-bold">95%</p></div><div><p class="font-semibold">Last Check</p><p>2 min ago</p></div><div><p class="font-semibold">Status</p><p>OK</p></div></div></div>
+                        <div class="bg-white p-4 rounded-lg shadow-md"><div class="flex justify-between items-start"><div><h3 class="font-bold text-gray-800">Kitchen</h3><p class="text-sm text-gray-500">Ground Floor</p></div><span class="text-xs font-bold text-red-600">ALERT</span></div><div class="mt-4 grid grid-cols-3 text-xs text-gray-600"><div><p class="font-semibold">Battery</p><p class="text-green-600 font-bold">87%</p></div><div><p class="font-semibold">Last Check</p><p>1 min ago</p></div><div><p class="font-semibold">Status</p><p class="text-red-500">FIRE</p></div></div></div>
+                        <div class="bg-white p-4 rounded-lg shadow-md"><div class="flex justify-between items-start"><div><h3 class="font-bold text-gray-800">Bedroom 1</h3><p class="text-sm text-gray-500">Second Floor</p></div><span class="text-xs font-bold text-green-600">ONLINE</span></div><div class="mt-4 grid grid-cols-3 text-xs text-gray-600"><div><p class="font-semibold">Battery</p><p class="text-green-600 font-bold">98%</p></div><div><p class="font-semibold">Last Check</p><p>5 min ago</p></div><div><p class="font-semibold">Status</p><p>OK</p></div></div></div>
+                    </div>
+                </main>
+
+                <!-- Screen 5: Alerts -->
+                <main id="alerts-screen" class="app-screen p-4 space-y-4 hidden">
+                    <div class="flex justify-between items-center mb-3">
+                        <h2 class="text-xl font-bold text-gray-800">Alert History</h2>
+                        <button class="text-sm text-blue-600">Clear All</button>
+                    </div>
+                    <div class="space-y-3">
+                         <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-stat-red"><div class="flex justify-between items-start"><div class="flex items-center"><div class="bg-active-red-bg p-2 rounded-full mr-3"><svg class="w-6 h-6 text-stat-red" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.657 7.343A8 8 0 0118.657 17.657c-1.566 1.566-2.343 3.657-2.343 3.657-1-2-4-2.986-7-2.986 2.5.986 5 .5 7-2.986zM12 12a2 2 0 100-4 2 2 0 000 4z"></path></svg></div><div><h3 class="font-bold text-gray-800">Fire Alert</h3><p class="text-sm text-gray-500">2 mins ago</p></div></div><span class="bg-active-red-bg text-active-red-text text-xs font-bold px-3 py-1 rounded-full">ACTIVE</span></div><div class="mt-3 text-sm text-gray-600 space-y-1 pl-12"><p><span class="font-semibold text-gray-700">Device:</span> Kitchen</p><p><span class="font-semibold text-gray-700">Severity:</span> <span class="text-stat-red font-bold">High</span></p></div><div class="mt-4 flex space-x-2 pl-12"><button class="call-trigger flex-1 bg-bfp-red text-white font-bold py-2 px-4 rounded-lg text-sm hover:bg-bfp-red-dark transition-colors">Call BFP</button><button class="flex-1 bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded-lg text-sm hover:bg-gray-300 transition-colors">Dismiss</button></div></div>
+                         <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-status-green"><div class="flex justify-between items-start"><div class="flex items-center"><div class="bg-resolved-green-bg p-2 rounded-full mr-3"><svg class="w-6 h-6 text-status-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg></div><div><h3 class="font-bold text-gray-800">Smoke Alert</h3><p class="text-sm text-gray-500">1 hour ago</p></div></div><span class="bg-resolved-green-bg text-resolved-green-text text-xs font-bold px-3 py-1 rounded-full">RESOLVED</span></div><div class="mt-2 text-sm text-gray-600 space-y-1 pl-12"><p><span class="font-semibold text-gray-700">Device:</span> Living Room</p></div></div>
+                    </div>
+                </main>
+
+                <!-- Screen 6: Location -->
+                <main id="location-screen" class="app-screen hidden">
+                    <div class="p-4"><h2 class="text-xl font-bold text-gray-800">Property Location</h2></div>
+                    <div id="map" class="w-full h-48 bg-gray-300"></div>
+                    <div class="p-4 bg-white">
+                        <h3 class="font-bold text-lg text-gray-800 mb-2">Property Information</h3>
+                        <div class="text-sm space-y-2 text-gray-600">
+                            <p><strong class="text-gray-800">Address:</strong> 123, Street, Dasmarinas, Cavite</p>
+                            <p><strong class="text-gray-800">Coordinates:</strong> 14.3313° N, 120.9358° E</p>
+                            <p><strong class="text-gray-800">Nearest BFP Station:</strong> BFP (2km) Dasma</p>
+                            <p><strong class="text-gray-800">Status:</strong> <span class="text-green-600 font-semibold">ONLINE</span></p>
+                        </div>
+                    </div>
+                </main>
+                
+                <!-- Screen 7: Settings -->
+                <main id="settings-screen" class="app-screen p-4 space-y-4 hidden">
+                    <h2 class="text-xl font-bold text-gray-800">Settings</h2>
+                    <div class="bg-white p-4 rounded-lg shadow-md text-center">
+                        <div class="w-24 h-24 rounded-full bg-bfp-red mx-auto mb-3 flex items-center justify-center text-white text-4xl font-bold">JD</div>
+                        <h3 class="font-bold text-xl text-gray-800">John Doe</h3>
+                        <p class="text-sm text-gray-500">Property Owner</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-md">
+                        <h3 class="font-bold text-gray-800 mb-4">Profile Information</h3>
+                        <div class="space-y-4 text-sm">
+                            <div class="flex items-center"><svg class="w-5 h-5 mr-3 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg><div><p class="text-gray-500">Full Name</p><p class="text-gray-800 font-semibold">John Doe</p></div></div>
+                            <div class="flex items-center"><svg class="w-5 h-5 mr-3 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path></svg><div><p class="text-gray-500">Email Address</p><p class="text-gray-800 font-semibold">johndoe@gmail.com</p></div></div>
+                            <div class="flex items-center"><svg class="w-5 h-5 mr-3 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path></svg><div><p class="text-gray-500">Phone Number</p><p class="text-gray-800 font-semibold">+639123456789</p></div></div>
+                            <div class="flex items-center"><svg class="w-5 h-5 mr-3 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg><div><p class="text-gray-500">Address</p><p class="text-gray-800 font-semibold">1-San Francisco Railway, Concepcion Norte</p></div></div>
+                        </div>
+                    </div>
+                    <div class="space-y-3 pt-2">
+                        <button class="w-full bg-gradient-to-br from-blue-500 to-blue-600 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                            Update Profile
+                        </button>
+                        <button class="w-full bg-red-100 text-red-600 font-semibold py-3 rounded-lg hover:bg-red-200 transition-all">
+                            Sign Out
+                        </button>
+                    </div>
+                </main>
+            </div>
+            
+            <!-- Bottom Navigation -->
+            <nav id="bottom-nav" class="bg-white border-t border-gray-200 flex justify-around sm:rounded-b-lg shadow-[0_-2px_5px_rgba(0,0,0,0.05)] z-20">
+                <a href="#home" data-screen="home-screen" class="nav-link flex flex-col items-center justify-center p-3 text-bfp-red w-full"><svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg><span class="text-xs font-semibold">Home</span></a>
+                <a href="#devices" data-screen="devices-screen" class="nav-link flex flex-col items-center justify-center p-3 text-gray-500 hover:text-bfp-red w-full"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg><span class="text-xs font-semibold">Devices</span></a>
+                <a href="#alerts" data-screen="alerts-screen" class="nav-link flex flex-col items-center justify-center p-3 text-gray-500 hover:text-bfp-red w-full relative"><span class="absolute top-2 right-6 w-2 h-2 bg-bfp-red rounded-full"></span><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg><span class="text-xs font-semibold">Alerts</span></a>
+                <a href="#location" data-screen="location-screen" class="nav-link flex flex-col items-center justify-center p-3 text-gray-500 hover:text-bfp-red w-full"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg><span class="text-xs font-semibold">Location</span></a>
+                <a href="#settings" data-screen="settings-screen" class="nav-link flex flex-col items-center justify-center p-3 text-gray-500 hover:text-bfp-red w-full"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg><span class="text-xs font-semibold">Settings</span></a>
+            </nav>
+        </div>
+        
+        <!-- Add Device Screen -->
+        <div id="add-device-screen" class="absolute inset-0 bg-gray-100 flex-col hidden z-30">
+            <header class="bg-white p-4 flex items-center justify-between border-b">
+                <button id="back-to-devices-btn"><svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
+                <h2 class="text-lg font-semibold text-gray-800">Add Device</h2>
+                <button><svg class="w-6 h-6 text-gray-600" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg></button>
+            </header>
+            <div class="p-6 flex-grow overflow-y-auto">
+                <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-blue-100 text-blue-500 rounded-full mx-auto flex items-center justify-center mb-4">
+                           <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.657 7.343A8 8 0 0118.657 17.657c-1.566 1.566-2.343 3.657-2.343 3.657-1-2-4-2.986-7-2.986 2.5.986 5 .5 7-2.986zM12 12a2 2 0 100-4 2 2 0 000 4z"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800">Fire Detector Setup</h3>
+                        <p class="text-gray-500 mt-2">Connect your new fire detection device to start monitoring.</p>
+                    </div>
+                    <ul class="mt-6 space-y-3 text-gray-700">
+                        <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Device powered on</li>
+                        <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Connected to WiFi</li>
+                        <li class="flex items-center text-blue-500"><svg class="w-5 h-5 animate-spin mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Configuring device...</li>
+                    </ul>
+                    <div class="mt-6 space-y-4">
+                        <div><label class="text-sm font-medium text-gray-600">Device Name</label><input type="text" value="Living Room Detector" class="mt-1 w-full p-2.5 border rounded-lg bg-gray-50"></div>
+                        <div><label class="text-sm font-medium text-gray-600">Location</label><select class="mt-1 w-full p-2.5 border rounded-lg bg-gray-50 appearance-none"><option>Living Room</option><option>Kitchen</option><option>Bedroom</option></select></div>
+                    </div>
+                </div>
+                <button class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors">+ Add Device</button>
+                 <div class="mt-8">
+                    <h3 class="font-bold text-gray-800 mb-3">Current Devices</h3>
+                    <div class="space-y-3">
+                        <div class="bg-white p-4 rounded-lg shadow-md flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-green-100 text-green-600 rounded-full flex items-center justify-center mr-3"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.657 7.343A8 8 0 0118.657 17.657c-1.566 1.566-2.343 3.657-2.343 3.657-1-2-4-2.986-7-2.986 2.5.986 5 .5 7-2.986zM12 12a2 2 0 100-4 2 2 0 000 4z"></path></svg></div>
+                                <div><p class="font-semibold text-gray-800">Kitchen Detector</p><p class="text-sm text-gray-500">Online</p></div>
+                            </div>
+                            <div class="w-2.5 h-2.5 bg-green-500 rounded-full"></div>
+                        </div>
+                         <div class="bg-white p-4 rounded-lg shadow-md flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-green-100 text-green-600 rounded-full flex items-center justify-center mr-3"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.657 7.343A8 8 0 0118.657 17.657c-1.566 1.566-2.343 3.657-2.343 3.657-1-2-4-2.986-7-2.986 2.5.986 5 .5 7-2.986zM12 12a2 2 0 100-4 2 2 0 000 4z"></path></svg></div>
+                                <div><p class="font-semibold text-gray-800">Bedroom Detector</p><p class="text-sm text-gray-500">Online</p></div>
+                            </div>
+                            <div class="w-2.5 h-2.5 bg-green-500 rounded-full"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Call Screen Modal -->
+    <div id="call-screen" class="fixed inset-0 bg-bfp-red text-white p-6 flex-col items-center justify-between hidden z-50">
+        <div class="text-center pt-16">
+            <div class="w-32 h-32 mx-auto rounded-full border-4 border-white/50 flex items-center justify-center">
+                <svg class="w-16 h-16 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 2Z"/></svg>
+            </div>
+            <h2 class="text-2xl font-bold mt-4">N/A</h2>
+            <p class="text-lg opacity-80">+63-000-000-0000</p>
+        </div>
+        <div class="text-center">
+            <div class="bg-white/20 rounded-full px-4 py-2 text-sm font-semibold">CONNECTED</div>
+            <p id="call-timer" class="text-lg mt-2">00:00</p>
+        </div>
+        <div class="w-full bg-white/10 rounded-lg p-4 text-sm">
+            <h3 class="font-bold mb-2">Emergency Details</h3>
+            <p><span class="opacity-80">Property:</span> 123 Main Street, Manila</p>
+            <p><span class="opacity-80">Alert Type:</span> Fire Detection</p>
+            <p><span class="opacity-80">Coordinates:</span> 14.5995° N, 120.9842° E</p>
+            <p><span class="opacity-80">Nearest Station:</span> Tondo Fire Station (2.3 km)</p>
+        </div>
+        <div class="w-full flex flex-col items-center">
+            <div class="flex space-x-8">
+                <button class="bg-white/20 p-4 rounded-full"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" clip-rule="evenodd"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"></path></svg></button>
+                <button class="bg-white/20 p-4 rounded-full"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M5.25 3.5a.75.75 0 000 1.5h9.5a.75.75 0 000-1.5h-9.5zM3.5 6.25a.75.75 0 01.75-.75h11.5a.75.75 0 010 1.5H4.25a.75.75 0 01-.75-.75zM2 9.25a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 9.25zM1.75 12a.75.75 0 000 1.5h16.5a.75.75 0 000-1.5H1.75zM1 15.25a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H1.75a.75.75 0 01-.75-.75z"></path></svg></button>
+                <button class="bg-white/20 p-4 rounded-full"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg></button>
+            </div>
+            <button id="end-call-btn" class="mt-6 bg-red-600 px-8 py-3 rounded-full font-semibold">End Call</button>
+        </div>
+    </div>
+    
+    <!-- Leaflet JS for Maps -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Elements ---
+            const splashScreen = document.getElementById('splash-screen');
+            const loginScreen = document.getElementById('login-screen');
+            const loginForm = document.getElementById('login-form');
+            const googleLoginBtn = document.getElementById('google-login-btn');
+            const appContainer = document.getElementById('app-container');
+            const mainContent = document.getElementById('main-content');
+            const screens = document.querySelectorAll('.app-screen');
+            const navLinks = document.querySelectorAll('.nav-link');
+            const callScreen = document.getElementById('call-screen');
+            const callTriggers = document.querySelectorAll('.call-trigger');
+            const endCallBtn = document.getElementById('end-call-btn');
+            const callTimerEl = document.getElementById('call-timer');
+            const addDeviceScreen = document.getElementById('add-device-screen');
+            const addDeviceScreenTrigger = document.getElementById('add-device-screen-trigger');
+            const backToDevicesBtn = document.getElementById('back-to-devices-btn');
+            
+            let map;
+            let callTimerInterval;
+            let seconds = 0;
+
+            // --- Functions ---
+            const showScreen = (screenId) => {
+                screens.forEach(s => s.classList.toggle('hidden', s.id !== screenId));
+                navLinks.forEach(l => {
+                    l.classList.toggle('text-bfp-red', l.dataset.screen === screenId);
+                    l.classList.toggle('text-gray-500', l.dataset.screen !== screenId);
+                });
+                if (screenId === 'location-screen' && !map) {
+                    map = L.map('map').setView([14.3313, 120.9358], 16);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' }).addTo(map);
+                    L.marker([14.3313, 120.9358]).addTo(map).bindPopup('Property Location').openPopup();
+                }
+            };
+            
+            const handleLogin = () => {
+                loginScreen.classList.add('hidden');
+                appContainer.classList.remove('hidden');
+                appContainer.classList.add('flex');
+                showScreen('home-screen');
+            };
+
+            const startCallTimer = () => {
+                seconds = 0;
+                callTimerEl.textContent = '00:00';
+                callTimerInterval = setInterval(() => {
+                    seconds++;
+                    const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
+                    const secs = String(seconds % 60).padStart(2, '0');
+                    callTimerEl.textContent = `${mins}:${secs}`;
+                }, 1000);
+            };
+
+            const stopCallTimer = () => {
+                clearInterval(callTimerInterval);
+            };
+
+            const updateDateTime = () => {
+                const now = new Date();
+                const dateOptions = { month: 'short', day: 'numeric', year: 'numeric' };
+                const timeOptions = { hour: 'numeric', minute: 'numeric', hour12: true };
+                document.getElementById('current-date').textContent = now.toLocaleDateString('en-US', dateOptions);
+                document.getElementById('current-time').textContent = now.toLocaleTimeString('en-US', timeOptions);
+            };
+
+            // --- Event Listeners ---
+            splashScreen.addEventListener('click', () => {
+                splashScreen.classList.add('hidden');
+                loginScreen.classList.remove('hidden');
+                loginScreen.classList.add('flex');
+            });
+
+            loginForm.addEventListener('submit', handleLogin);
+            googleLoginBtn.addEventListener('click', handleLogin);
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    showScreen(e.currentTarget.dataset.screen);
+                });
+            });
+
+            callTriggers.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    callScreen.classList.remove('hidden');
+                    callScreen.classList.add('flex');
+                    startCallTimer();
+                });
+            });
+
+            endCallBtn.addEventListener('click', () => {
+                callScreen.classList.add('hidden');
+                callScreen.classList.remove('flex');
+                stopCallTimer();
+            });
+            
+            addDeviceScreenTrigger.addEventListener('click', () => {
+                mainContent.classList.add('hidden');
+                addDeviceScreen.classList.remove('hidden');
+                addDeviceScreen.classList.add('flex');
+            });
+
+            backToDevicesBtn.addEventListener('click', () => {
+                addDeviceScreen.classList.add('hidden');
+                addDeviceScreen.classList.remove('flex');
+                mainContent.classList.remove('hidden');
+                showScreen('devices-screen');
+            });
+
+
+            // --- Initializations ---
+            updateDateTime();
+            setInterval(updateDateTime, 60000);
+
+            // --- PWA Setup ---
+            const manifestContent = { name: "BFP Early Alert", short_name: "BFP Alert", start_url: ".", display: "standalone", background_color: "#ffffff", theme_color: "#C82828", description: "Integrated IoT Fire Safety Solution", icons: [{ src: "https://placehold.co/192x192/003399/FFFFFF?text=BFP", sizes: "192x192", type: "image/png" }, { src: "https://placehold.co/512x512/003399/FFFFFF?text=BFP", sizes: "512x512", type: "image/png" }] };
+            const manifestBlob = new Blob([JSON.stringify(manifestContent)], { type: 'application/json' });
+            document.getElementById('manifest').href = URL.createObjectURL(manifestBlob);
+            const serviceWorkerScript = `const CACHE_NAME = 'bfp-alert-v6'; const ASSETS_TO_CACHE = ['/', './index.html']; self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(ASSETS_TO_CACHE))); }); self.addEventListener('fetch', e => { if (e.request.mode === 'navigate') { e.respondWith(caches.match('/').then(r => r || fetch(e.request))); } });`;
+            const swBlob = new Blob([serviceWorkerScript], { type: 'application/javascript' });
+            if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register(URL.createObjectURL(swBlob)); }); }
+        });
+    </script>
+</body>
+</html>
+

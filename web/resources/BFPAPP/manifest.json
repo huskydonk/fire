@@ -1,0 +1,21 @@
+{
+  "name": "BFP Early Alert",
+  "short_name": "BFP Alert",
+  "start_url": "index.php",
+  "display": "standalone",
+  "background_color": "#F3F4F6",
+  "theme_color": "#C82828",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/9312/9312231.png",
+      "sizes": "192x192",
+         "purpose": "any"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/9312/9312231.png",
+      "sizes": "512x512",
+         "purpose": "any"
+    }
+  ]
+}
